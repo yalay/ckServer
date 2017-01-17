@@ -73,6 +73,6 @@ func ckHandler(ctx *iris.Context) {
 		ctx.NotFound()
 		return
 	}
-	userIp := ctx.RemoteAddr()
-	ctx.Redirect(urls[0][0])
+
+	ctx.Redirect(conf.GetCkLeastUrl(ctx.RemoteAddr(), urls[0]))
 }
