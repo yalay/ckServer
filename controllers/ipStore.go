@@ -1,7 +1,8 @@
-package conf
+package controllers
 
 import (
 	"net/url"
+	"sync"
 )
 
 var gIpStore *ipStore
@@ -9,6 +10,7 @@ var gIpStore *ipStore
 type ipStore struct {
 	// ip->urlType->count
 	ipCounts map[string]map[string]int
+	sync.RWMutex
 }
 
 func init() {
@@ -23,6 +25,8 @@ func GetCkLeastUrl(ip string, ckUrls []string) string {
 }
 
 func (s *ipStore) getCount(ip, host string) int {
+	s.RLock()
+	defer s.RUnlock()
 	if counts, ok := s.ipCounts[ip]; !ok {
 		return 0
 	} else {
@@ -41,6 +45,7 @@ func (s *ipStore) counts(ip, ckUrl string) {
 	}
 
 	host := ckParsedUrl.Host
+	s.Lock()
 	if counts, ok := s.ipCounts[ip]; !ok {
 		s.ipCounts[ip] = make(map[string]int, 3)
 		s.ipCounts[ip][host] = 1
@@ -51,6 +56,7 @@ func (s *ipStore) counts(ip, ckUrl string) {
 			counts[host] = curNum + 1
 		}
 	}
+	s.Unlock()
 }
 
 func (s *ipStore) getCkLeastUrl(ip string, ckUrls []string) string {
