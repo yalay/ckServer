@@ -76,8 +76,7 @@ func getArticleKeyFromRefer(rawRefer string) string {
 		if className != "article" {
 			return ""
 		}
-		articleId := referValues.Get("id")
-		articleKey = "article-" + articleId
+		articleKey = referValues.Get("id")
 	}
 	return articleKey
 }

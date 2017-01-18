@@ -33,18 +33,18 @@
                 <div class="ztlb_nr_block_r_info">
                     <div class="ztlb_nr_block_r_info_l">
                         <div class="ztlb_nr_block_r_info_num">37</div>
-                        <div>预览</div>
+                        <div>今日预览数</div>
                     </div>
                     <div class="ztlb_nr_block_r_info_r">
                         <div class="ztlb_nr_block_r_info_num">182</div>
-                        <div>下载</div>
+                        <div>今日下载数</div>
                     </div>
                 </div>
                 <a class="ztlb_nr_block_r_title">{{title}}</a>
                 <span class="ztlb_nr_block_r_nr">{{desc}}....</span>
                 <div class="ztlb_nr_block_r_user">点击下载
                 {% for url in downloadUrls %}
-                    <a href={{url}} target="_blank"><img src="img/kj.png" alt=""></a>
+                    <a href={{url}} target="_blank"><button type="button" class="am-btn am-btn-danger">{{title}}</button></a>
                 {% endfor %}
                 </div>
             </div>

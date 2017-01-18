@@ -13,6 +13,7 @@ const (
 )
 
 // /ck?aid=123&idx=1
+// idx从1开始计数，0是非法
 func CkHandler(ctx *iris.Context) {
 	articleId := ctx.URLParam("aid")
 	if articleId == "" {
