@@ -42,11 +42,11 @@
                 </div>
                 <a class="ztlb_nr_block_r_title">{{title}}</a>
                 <span class="ztlb_nr_block_r_nr">{{desc}}....</span>
-                <div class="ztlb_nr_block_r_user">点击下载
                 {% for url in downloadUrls %}
-                    <a href={{url}} target="_blank"><button type="button" class="am-btn am-btn-danger">{{title}}</button></a>
-                {% endfor %}
+                <div class="ztlb_nr_block_r_user">
+                    <a class="am-btn am-btn-danger am-btn-block" href={{url}} target="_blank">{{title}}</a>
                 </div>
+                {% endfor %}
             </div>
         </div>
         <div class="ztlb_nr_block_r_info_copy_bg">
