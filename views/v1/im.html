@@ -32,39 +32,41 @@
             <div class="ztlb_nr_block_r">
                 <div class="ztlb_nr_block_r_info">
                     <div class="ztlb_nr_block_r_info_l">
-                        <div class="ztlb_nr_block_r_info_num">37</div>
+                        <div class="ztlb_nr_block_r_info_num">{{im}}</div>
                         <div>今日预览数</div>
                     </div>
                     <div class="ztlb_nr_block_r_info_r">
-                        <div class="ztlb_nr_block_r_info_num">182</div>
+                        <div class="ztlb_nr_block_r_info_num">{{ck}}</div>
                         <div>今日下载数</div>
                     </div>
                 </div>
-                <a class="ztlb_nr_block_r_title">{{title}}</a>
-                <span class="ztlb_nr_block_r_nr">{{desc}}....</span>
-                {% for url in downloadUrls %}
+                <div class="ztlb_nr_block_r_title">{{title}}</div>
+                <span class="ztlb_nr_block_r_nr">{{desc}}...</span>
                 <div class="ztlb_nr_block_r_user">
-                    <a class="am-btn am-btn-danger am-btn-block" href={{url}} target="_blank">{{title}}</a>
+                    <span>下载地址：</span>
+                    {% for url in downloadUrls %}
+                    <a class="am-btn am-btn-primary" href={{url}} target="_blank">
+                        {{title}} <i class="am-icon-cloud-download"></i>
+                    </a>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+
             </div>
         </div>
         <div class="ztlb_nr_block_r_info_copy_bg">
-            <span>收录：82</span>
-            <span>人气：74</span>
+            <span>今日预览数：{{im}}</span>
+            <span>今日下载数：{{ck}}</span>
         </div>
         <div class="ztlb_nr_block_r_info_copy"></div>
     </div>
 </div>
 <div class="ztlb_nr_block_r_user ztlb_nr_block_r_user_copy">
-    <span>参与用户</span>
-    <img src="img/kj.png" alt="">
-    <img src="img/kj.png" alt="">
-    <img src="img/kj.png" alt="">
-    <img src="img/kj.png" alt="">
-    <img src="img/kj.png" alt="">
-    <img src="img/kj.png" alt="">
-    <img src="img/kj.png" alt="">
+    <span>下载地址：</span>
+    {% for url in downloadUrls %}
+    <a class="am-btn am-btn-primary" href={{url}} target="_blank">
+        {{title}} <i class="am-icon-cloud-download"></i>
+    </a>
+    {% endfor %}
 </div>
 
 <div class="am-g ztlb_nrlist">
@@ -111,17 +113,5 @@
     </div>
     <div class="am_info_line">Copyright(c)2015 <span>PetShow</span> All Rights Reserved </div>
 </footer>
-<script>
- $(function(){
-  ZhuanTi_list_user()
-$(window).resize(function() {
-  ZhuanTi_list_user()
-});
-function ZhuanTi_list_user(){
-if($(window).width() < 810)
-$('.ztlb_nr_block_r_user').each(function(){$(this).children().each(function(index){if(index>5){$(this).hide()}else{$(this).show()}})});
- }
-});
-</script>
 </body>
 </html>

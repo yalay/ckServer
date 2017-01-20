@@ -291,7 +291,7 @@ content: " ";display: block;margin-top: -7px;margin-left: -3px; }
 /* 专题列表内容*/
 .ztlb_nrlist{max-width: 850px; margin-bottom: 50px; }
 .ztlb_nrlist {}
-.ztlb_nr_block_r_title:hover {  color: #fff;}
+.ztlb_nr_block_r_title:hover { color: red;}
 .ztlb_nr_block_r_user_copy { display: none;}
 .ztlb_nr_block_r_info_copy { display: none;}
 .ztlb_nr_block_r_info_copy_bg { display: none;}

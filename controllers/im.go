@@ -15,8 +15,10 @@ const (
 
 var emptyParams = map[string]interface{}{
 	"id":           0,
-	"title":        "empty-title",
-	"desc":         "empty-desc",
+	"im":           0,
+	"ck":           0,
+	"title":        "未知标题",
+	"desc":         "没找到对应下载内容，请重新从文章页点击下载",
 	"cover":        "http://blog.vvniu.com/img/niu.jpg",
 	"downloadUrls": nil,
 }
@@ -41,6 +43,7 @@ func ImHandler(ctx *iris.Context) {
 		return
 	}
 
+	IncImCount(articleKey)
 	urls := conf.GetUrlsByArticleKey(articleKey)
 	pkgTotalNum := len(urls)
 	downloadUrls := make([]string, pkgTotalNum)
@@ -49,6 +52,8 @@ func ImHandler(ctx *iris.Context) {
 	}
 	params := map[string]interface{}{
 		"id":           articleId,
+		"im":           GetImCount(articleKey),
+		"ck":           GetCkCount(articleKey),
 		"title":        "test-titledddd",
 		"desc":         "test-desc",
 		"cover":        "http://blog.vvniu.com/img/niu.jpg",
@@ -76,7 +81,7 @@ func getArticleKeyFromRefer(rawRefer string) string {
 		if className != "article" {
 			return ""
 		}
-		articleKey = referValues.Get("id")
+		articleKey = kArticleKeyPrefix + referValues.Get("id")
 	}
 	return articleKey
 }

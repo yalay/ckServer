@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"common"
-	"conf"
+	//"conf"
 	"fmt"
+	"models"
 
 	"github.com/kataras/iris"
 )
@@ -22,12 +23,14 @@ func CkHandler(ctx *iris.Context) {
 	}
 
 	articleKey := genArticleKey(articleId)
-	urls := conf.GetUrlsByArticleKey(articleKey)
+	urls := models.GetArticleDownloadUrls(articleKey)
+	//urls := conf.GetUrlsByArticleKey(articleKey)
 	if len(urls) == 0 {
 		ctx.NotFound()
 		return
 	}
 
+	IncCkCount(articleKey)
 	pkgIdx := common.Atoi(ctx.URLParam("idx"))
 	if pkgIdx == 0 || pkgIdx > len(urls) {
 		ctx.NotFound()

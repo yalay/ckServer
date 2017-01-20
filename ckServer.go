@@ -3,11 +3,22 @@ package main
 import (
 	"common"
 	"controllers"
+	"models"
 
 	"github.com/iris-contrib/middleware/logger"
 	"github.com/kataras/go-template/django"
 	"github.com/kataras/iris"
 )
+
+/*
+  article-169:
+    -
+      - http://test1.com
+      - http://test1-1.com
+    -
+      - http://test2.com
+      - http://test2-1.com
+*/
 
 func main() {
 	iris.Config.IsDevelopment = true // this will reload the templates on each request
@@ -19,6 +30,10 @@ func main() {
 	iris.Use(logger.New())
 	iris.UseTemplate(django.New()).Directory(common.TEMPLATE_PATH, ".html")
 
+	downloadUrls := make([][]string, 2)
+	downloadUrls[0] = []string{"http://test1.com", "http://test1-1.com"}
+	downloadUrls[1] = []string{"http://test2.com", "http://test2-1.com"}
+	models.InsertArticleDownloadUrls(169, downloadUrls)
 	iris.Get("/", hi)
 	iris.Get("/article-169.html", controllers.ImHandler)
 	iris.Get("/ck", controllers.CkHandler)
