@@ -14,6 +14,7 @@ var gConfig = &Config{}
 
 type Config struct {
 	// articleId->pkgList->urls
+	AdUrls       map[string][][]string
 	DownloadUrls map[string][][]string
 }
 

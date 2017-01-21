@@ -38,7 +38,7 @@ func ImHandler(ctx *iris.Context) {
 		return
 	}
 	articleId := getIdFromArticleKey(articleKey)
-	if articleId == "" {
+	if articleId == 0 {
 		ctx.MustRender("im.html", emptyParams)
 		return
 	}

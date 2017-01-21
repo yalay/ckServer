@@ -16,23 +16,23 @@ const (
 // /ck?aid=123&idx=1
 // idx从1开始计数，0是非法
 func CkHandler(ctx *iris.Context) {
-	articleId := ctx.URLParam("aid")
-	if articleId == "" {
+	articleId := common.Atoi(ctx.URLParam("aid"))
+	if articleId == 0 {
 		ctx.NotFound()
 		return
 	}
 
-	articleKey := genArticleKey(articleId)
-	urls := models.GetArticleDownloadUrls(articleKey)
+	urls := models.GetArticleAdUrls(articleId)
 	//urls := conf.GetUrlsByArticleKey(articleKey)
 	if len(urls) == 0 {
 		ctx.NotFound()
 		return
 	}
 
+	articleKey := genArticleKey(articleId)
 	IncCkCount(articleKey)
 	pkgIdx := common.Atoi(ctx.URLParam("idx"))
-	if pkgIdx == 0 || pkgIdx > len(urls) {
+	if pkgIdx == 0 {
 		ctx.NotFound()
 		return
 	}
@@ -41,6 +41,6 @@ func CkHandler(ctx *iris.Context) {
 }
 
 // 动态点击链接
-func GenDynamicCkUrl(articleId string, index int) string {
-	return fmt.Sprintf("%s?aid=%s&idx=%d", KPathCk, articleId, index)
+func GenDynamicCkUrl(articleId int, index int) string {
+	return fmt.Sprintf("%s?aid=%d&idx=%d", KPathCk, articleId, index)
 }
