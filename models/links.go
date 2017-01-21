@@ -24,140 +24,132 @@ const (
 )
 
 type Article struct {
-	ID           int `gorm:"primary_key"`
-	Title        string
-	Desc         string
-	AdPkgs       []Pkg // 广告点击跳转链接
-	DownloadPkgs []Pkg // 真正的下载链接
+	ID            int `gorm:"primary_key"`
+	Title         string
+	Desc          string
+	AdLinks       []AdLink       // 广告点击跳转链接
+	DownloadLinks []DownloadLink // 真正的下载链接
 }
 
-type Pkg struct {
+type AdLink struct {
 	gorm.Model
 	ArticleID int
-	Type      int
 	PkgIndex  int // 分包序号
-	Links     []Link
+	Url       string
 }
 
-type Link struct {
+type DownloadLink struct {
 	gorm.Model
-	PkgID int
-	Url   string
+	ArticleID int
+	PkgIndex  int // 分包序号
+	Url       string
 }
 
 func init() {
 	var article = Article{}
-	var pkg = Pkg{}
-	var link = Link{}
+	var adLink = AdLink{}
+	var downloadLink = DownloadLink{}
 	if !sqliteDb.HasTable(&article) {
 		sqliteDb.CreateTable(&article)
 	}
-	if !sqliteDb.HasTable(&pkg) {
-		sqliteDb.CreateTable(&pkg)
-		sqliteDb.Model(&article).Related(&pkg)
+	if !sqliteDb.HasTable(&adLink) {
+		sqliteDb.CreateTable(&adLink)
+		sqliteDb.Model(&article).Related(&adLink)
 	}
-	if !sqliteDb.HasTable(&link) {
-		sqliteDb.CreateTable(&link)
-		sqliteDb.Model(&pkg).Related(&link)
+	if !sqliteDb.HasTable(&downloadLink) {
+		sqliteDb.CreateTable(&downloadLink)
+		sqliteDb.Model(&article).Related(&downloadLink)
 	}
 }
 
-func UpdateArticleAttr(articleId int, title, desc string) {
-	var article = Article{}
-	sqliteDb.First(&article, articleId)
-	article.Title = title
-	article.Desc = desc
+func UpdateArticle(articleId int, title, desc string) {
+	sqliteDb.Model(Article{ID: articleId}).Update(Article{Title: title, Desc: desc})
+}
+
+func AddArticleAdUrl(articleId int, pkgIndex int, adUrl string) {
+	article := Article{ID: articleId}
+	associton := sqliteDb.Model(&article).Association("AdLinks")
+	if associton == nil || associton.Count() == 0 {
+		adLinks := make([]AdLink, 1)
+		adLinks[0].PkgIndex = pkgIndex
+		adLinks[0].Url = adUrl
+		article.AdLinks = adLinks
+	} else {
+		adLinks := make([]AdLink, 0, associton.Count()+1)
+		associton.Find(&adLinks)
+		adLinks = append(adLinks, AdLink{
+			PkgIndex: pkgIndex,
+			Url:      adUrl,
+		})
+		article.AdLinks = adLinks
+	}
 	sqliteDb.Save(&article)
 }
 
-func InsertArticleUrls(articleId int, adUrls [][]string, downloadUrls [][]string) {
-	if len(adUrls) == 0 || len(adUrls) != len(downloadUrls) {
-		log.Printf("invalid urls. articleId%s\n", articleId)
-		return
-	}
-
-	adPkgs := make([]Pkg, len(adUrls))
-	for i, urls := range adUrls {
-		if len(urls) == 0 {
-			log.Printf("empty adUrls. articleId%s\n", articleId)
-			continue
-		}
-
-		for _, url := range urls {
-			if url == "" {
-				log.Printf("invalid ad url. articleId%s\n", articleId)
-				continue
-			}
-			var link = Link{
-				Url: url,
-			}
-			adPkgs[i].PkgIndex = i
-			adPkgs[i].Type = kLinkTypeAd
-			adPkgs[i].Links = append(adPkgs[i].Links, link)
-		}
-	}
-
-	downloadPkgs := make([]Pkg, len(downloadUrls))
-	for i, urls := range downloadUrls {
-		if len(urls) == 0 {
-			log.Printf("empty download urls. articleId%s\n", articleId)
-			continue
-		}
-
-		for _, url := range urls {
-			if url == "" {
-				log.Printf("invalid url. articleId%s\n", articleId)
-				continue
-			}
-			var link = Link{
-				Url: url,
-			}
-			downloadPkgs[i].PkgIndex = i
-			downloadPkgs[i].Type = kLinkTypeDownload
-			downloadPkgs[i].Links = append(downloadPkgs[i].Links, link)
-		}
-	}
-
-	var article = Article{
-		ID:           articleId,
-		AdPkgs:       adPkgs,
-		DownloadPkgs: downloadPkgs,
+func AddArticleDownloadUrl(articleId int, pkgIndex int, downloadUrl string) {
+	article := Article{ID: articleId}
+	associton := sqliteDb.Model(&article).Association("DownloadLinks")
+	if associton == nil || associton.Count() == 0 {
+		downloadLinks := make([]DownloadLink, 1)
+		downloadLinks[0].PkgIndex = pkgIndex
+		downloadLinks[0].Url = downloadUrl
+		article.DownloadLinks = downloadLinks
+	} else {
+		downloadLinks := make([]DownloadLink, 0, associton.Count()+1)
+		associton.Find(&downloadLinks)
+		downloadLinks = append(downloadLinks, DownloadLink{
+			PkgIndex: pkgIndex,
+			Url:      downloadUrl,
+		})
+		article.DownloadLinks = downloadLinks
 	}
 	sqliteDb.Save(&article)
 }
 
 func GetArticleAdUrls(id int) map[int][]string {
-	var article = Article{
-		ID: id,
-	}
-
-	adPkgs := make([]Pkg, 0)
-	sqliteDb.Model(&article).Association("AdPkgs").Find(&adPkgs)
-	if len(adPkgs) == 0 {
+	associton := sqliteDb.Model(&Article{ID: id}).Association("AdLinks")
+	if associton == nil || associton.Count() == 0 {
 		return nil
 	}
 
-	rspUrls := make(map[int][]string, len(adPkgs))
-	for _, adPkg := range adPkgs {
-		if adPkg.Type != kLinkTypeAd {
-			continue
-		}
-		adLinks := make([]Link, 0)
-		sqliteDb.Model(&adPkg).Association("Links").Find(&adLinks)
-		if len(adLinks) == 0 {
-			continue
-		}
-
-		adUrls := make([]string, 0, len(adLinks))
-		for _, adLink := range adLinks {
-			if adLink.Url == "" {
-				continue
-			}
-			adUrls = append(adUrls, adLink.Url)
-		}
-		rspUrls[adPkg.PkgIndex] = adUrls
+	adLinks := make([]AdLink, associton.Count())
+	associton.Find(&adLinks)
+	if len(adLinks) == 0 {
+		return nil
 	}
 
-	log.Printf("rspUrls:%+v", rspUrls)
+	rspUrls := make(map[int][]string, 0)
+	for _, adLink := range adLinks {
+		curIndex := adLink.PkgIndex
+		if rspUrls[curIndex] == nil {
+			rspUrls[curIndex] = make([]string, 0, len(adLinks))
+		}
+		rspUrls[curIndex] = append(rspUrls[curIndex], adLink.Url)
+	}
+
+	return rspUrls
+}
+
+func GetArticleDownloadUrls(id int) map[int][]string {
+	associton := sqliteDb.Model(&Article{ID: id}).Association("DownloadLinks")
+	if associton == nil || associton.Count() == 0 {
+		return nil
+	}
+
+	downloadLinks := make([]DownloadLink, associton.Count())
+	associton.Find(&downloadLinks)
+	if len(downloadLinks) == 0 {
+		return nil
+	}
+
+	rspUrls := make(map[int][]string, 0)
+	for _, downloadLink := range downloadLinks {
+		curIndex := downloadLink.PkgIndex
+		if rspUrls[curIndex] == nil {
+			rspUrls[curIndex] = make([]string, 0, len(downloadLinks))
+		}
+		rspUrls[curIndex] = append(rspUrls[curIndex], downloadLink.Url)
+	}
+
 	return rspUrls
 }

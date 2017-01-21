@@ -3,7 +3,7 @@ package main
 import (
 	"common"
 	"controllers"
-	//"models"
+	"models"
 
 	"github.com/iris-contrib/middleware/logger"
 	"github.com/kataras/go-template/django"
@@ -30,14 +30,15 @@ func main() {
 	iris.Use(logger.New())
 	iris.UseTemplate(django.New()).Directory(common.TEMPLATE_PATH, ".html")
 
-	// adUrls := make([][]string, 2)
-	// adUrls[0] = []string{"http://ad1.com", "http://ad1-1.com"}
-	// adUrls[1] = []string{"http://ad2.com", "http://ad2-1.com"}
+	models.UpdateArticle(169, "title-169", "desc-169")
+	models.AddArticleAdUrl(169, 0, "http://ad1.com")
+	models.AddArticleAdUrl(169, 0, "http://ad1-1.com")
+	models.AddArticleAdUrl(169, 1, "http://ad2.com")
+	models.AddArticleAdUrl(169, 1, "http://ad2-1.com")
 
-	// downloadUrls := make([][]string, 2)
-	// downloadUrls[0] = []string{"http://test1.com", "http://test1-1.com"}
-	// downloadUrls[1] = []string{"http://test2.com", "http://test2-1.com"}
-	// models.InsertArticleUrls(169, adUrls, downloadUrls)
+	models.AddArticleDownloadUrl(169, 0, "http://localhost/1")
+	models.AddArticleDownloadUrl(169, 1, "http://localhost/2")
+
 	iris.Get("/", hi)
 	iris.Get("/article-169.html", controllers.ImHandler)
 	iris.Get("/ck", controllers.CkHandler)
