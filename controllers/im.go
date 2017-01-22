@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"conf"
 	"net/url"
 	"path"
 	"strings"
@@ -43,10 +42,14 @@ func ImHandler(ctx *iris.Context) {
 		return
 	}
 
+	pkgCount := GetArticlePkgCount(articleId)
+	if pkgCount == 0 {
+		ctx.MustRender("im.html", emptyParams)
+		return
+	}
+
 	IncImCount(articleKey)
-	urls := conf.GetUrlsByArticleKey(articleKey)
-	pkgTotalNum := len(urls)
-	downloadUrls := make([]string, pkgTotalNum)
+	downloadUrls := make([]string, pkgCount)
 	for i, _ := range downloadUrls {
 		downloadUrls[i] = GenEncodedCkUrl(articleId, int32(i+1))
 	}

@@ -39,6 +39,10 @@ func GetArticleAdUrls(id int32) map[int32][]string {
 	return sqliteDb.GetArticleAdUrls(id)
 }
 
+func GetArticlePkgCount(id int32) int {
+	return sqliteDb.GetArticlePkgCount(id)
+}
+
 func GetArticleDownloadUrls(id int32) map[int32][]string {
 	return sqliteDb.GetArticleDownloadUrls(id)
 }

@@ -13,9 +13,6 @@ import (
 var gConfig = &Config{}
 
 type Config struct {
-	// articleId->pkgList->urls
-	AdUrls       map[string][][]string
-	DownloadUrls map[string][][]string
 }
 
 func init() {
@@ -24,19 +21,6 @@ func init() {
 	flag.Parse()
 
 	reloadConf(configFile)
-}
-
-func GetUrlsByArticleKey(articleKey string) [][]string {
-	if gConfig == nil {
-		return nil
-	}
-
-	urls, ok := gConfig.DownloadUrls[articleKey]
-	if !ok {
-		return nil
-	}
-
-	return urls
 }
 
 func reloadConf(configFile string) {

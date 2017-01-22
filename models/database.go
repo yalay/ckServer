@@ -168,6 +168,14 @@ func (m *MyDb) GetArticleDownloadUrls(id int32) map[int32][]string {
 	return rspUrls
 }
 
+func (m *MyDb) GetArticlePkgCount(id int32) int {
+	associton := m.DB.Model(&Article{ID: id}).Association("DownloadLinks")
+	if associton == nil {
+		return 0
+	}
+	return associton.Count()
+}
+
 func (m *MyDb) DeleteAdUrl(url string) {
 	m.DB.Where("url = ?", url).Delete(&AdLink{})
 }
