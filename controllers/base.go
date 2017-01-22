@@ -10,10 +10,10 @@ const (
 	kArticleKeyPrefix = "article-"
 )
 
-func genArticleKey(articleId int) string {
-	return kArticleKeyPrefix + strconv.Itoa(articleId)
+func genArticleKey(articleId int32) string {
+	return kArticleKeyPrefix + strconv.Itoa(int(articleId))
 }
 
-func getIdFromArticleKey(articleKey string) int {
-	return common.Atoi(strings.TrimPrefix(articleKey, kArticleKeyPrefix))
+func getIdFromArticleKey(articleKey string) int32 {
+	return common.Atoi32(strings.TrimPrefix(articleKey, kArticleKeyPrefix))
 }

@@ -48,7 +48,7 @@ func ImHandler(ctx *iris.Context) {
 	pkgTotalNum := len(urls)
 	downloadUrls := make([]string, pkgTotalNum)
 	for i, _ := range downloadUrls {
-		downloadUrls[i] = GenDynamicCkUrl(articleId, i+1)
+		downloadUrls[i] = GenEncodedCkUrl(articleId, int32(i+1))
 	}
 	params := map[string]interface{}{
 		"id":           articleId,

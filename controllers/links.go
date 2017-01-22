@@ -17,29 +17,29 @@ func init() {
 	}
 }
 
-func AddArticle(articleId int, title, desc string) {
+func AddArticle(articleId int32, title, desc string) {
 	sqliteDb.AddArticle(articleId, title, desc)
 }
 
-func AddArticleAdUrl(articleId int, pkgIndex int, adUrl string) {
+func AddArticleAdUrl(articleId int32, pkgIndex int32, adUrl string) {
 	err := sqliteDb.AddArticleAdUrl(articleId, pkgIndex, adUrl)
 	if err != nil {
 		log.Println(err.Error())
 	}
 }
 
-func AddArticleDownloadUrl(articleId int, pkgIndex int, downloadUrl string) {
+func AddArticleDownloadUrl(articleId int32, pkgIndex int32, downloadUrl string) {
 	err := sqliteDb.AddArticleDownloadUrl(articleId, pkgIndex, downloadUrl)
 	if err != nil {
 		log.Println(err.Error())
 	}
 }
 
-func GetArticleAdUrls(id int) map[int][]string {
+func GetArticleAdUrls(id int32) map[int32][]string {
 	return sqliteDb.GetArticleAdUrls(id)
 }
 
-func GetArticleDownloadUrls(id int) map[int][]string {
+func GetArticleDownloadUrls(id int32) map[int32][]string {
 	return sqliteDb.GetArticleDownloadUrls(id)
 }
 

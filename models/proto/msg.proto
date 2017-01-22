@@ -1,0 +1,8 @@
+syntax = "proto3";
+package models;
+
+message Msg
+{
+    int32 articleId = 1;
+    int32 pkgIndex = 2;
+}

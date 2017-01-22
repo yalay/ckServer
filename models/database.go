@@ -10,7 +10,7 @@ type MyDb struct {
 }
 
 type Article struct {
-	ID            int `gorm:"primary_key"`
+	ID            int32 `gorm:"primary_key"`
 	Title         string
 	Desc          string
 	AdLinks       []AdLink       // 广告点击跳转链接
@@ -19,15 +19,15 @@ type Article struct {
 
 type AdLink struct {
 	gorm.Model
-	ArticleID int
-	PkgIndex  int // 分包序号
+	ArticleID int32
+	PkgIndex  int32 // 分包序号
 	Url       string
 }
 
 type DownloadLink struct {
 	gorm.Model
-	ArticleID int
-	PkgIndex  int // 分包序号
+	ArticleID int32
+	PkgIndex  int32 // 分包序号
 	Url       string
 }
 
@@ -60,11 +60,11 @@ func (m *MyDb) OpenDataBase(dbType, dbFile string) error {
 	return nil
 }
 
-func (m *MyDb) AddArticle(articleId int, title, desc string) {
+func (m *MyDb) AddArticle(articleId int32, title, desc string) {
 	m.DB.Model(Article{ID: articleId}).Updates(Article{Title: title, Desc: desc})
 }
 
-func (m *MyDb) AddArticleAdUrl(articleId int, pkgIndex int, adUrl string) error {
+func (m *MyDb) AddArticleAdUrl(articleId int32, pkgIndex int32, adUrl string) error {
 	// 是否已经在数据库中
 	var count int
 	m.DB.Model(&AdLink{}).Where("url = ?", adUrl).Count(&count)
@@ -92,7 +92,7 @@ func (m *MyDb) AddArticleAdUrl(articleId int, pkgIndex int, adUrl string) error 
 	return nil
 }
 
-func (m *MyDb) AddArticleDownloadUrl(articleId int, pkgIndex int, downloadUrl string) error {
+func (m *MyDb) AddArticleDownloadUrl(articleId int32, pkgIndex int32, downloadUrl string) error {
 	// 是否已经在数据库中
 	var count int
 	m.DB.Model(&DownloadLink{}).Where("url = ?", downloadUrl).Count(&count)
@@ -120,7 +120,7 @@ func (m *MyDb) AddArticleDownloadUrl(articleId int, pkgIndex int, downloadUrl st
 	return nil
 }
 
-func (m *MyDb) GetArticleAdUrls(id int) map[int][]string {
+func (m *MyDb) GetArticleAdUrls(id int32) map[int32][]string {
 	associton := m.DB.Model(&Article{ID: id}).Association("AdLinks")
 	if associton == nil || associton.Count() == 0 {
 		return nil
@@ -132,7 +132,7 @@ func (m *MyDb) GetArticleAdUrls(id int) map[int][]string {
 		return nil
 	}
 
-	rspUrls := make(map[int][]string, 0)
+	rspUrls := make(map[int32][]string, 0)
 	for _, adLink := range adLinks {
 		curIndex := adLink.PkgIndex
 		if rspUrls[curIndex] == nil {
@@ -144,7 +144,7 @@ func (m *MyDb) GetArticleAdUrls(id int) map[int][]string {
 	return rspUrls
 }
 
-func (m *MyDb) GetArticleDownloadUrls(id int) map[int][]string {
+func (m *MyDb) GetArticleDownloadUrls(id int32) map[int32][]string {
 	associton := m.DB.Model(&Article{ID: id}).Association("DownloadLinks")
 	if associton == nil || associton.Count() == 0 {
 		return nil
@@ -156,7 +156,7 @@ func (m *MyDb) GetArticleDownloadUrls(id int) map[int][]string {
 		return nil
 	}
 
-	rspUrls := make(map[int][]string, 0)
+	rspUrls := make(map[int32][]string, 0)
 	for _, downloadLink := range downloadLinks {
 		curIndex := downloadLink.PkgIndex
 		if rspUrls[curIndex] == nil {
