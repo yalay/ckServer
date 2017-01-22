@@ -4,7 +4,6 @@ import (
 	"common"
 	//"conf"
 	"fmt"
-	"models"
 
 	"github.com/kataras/iris"
 )
@@ -22,7 +21,7 @@ func CkHandler(ctx *iris.Context) {
 		return
 	}
 
-	urls := models.GetArticleAdUrls(articleId)
+	urls := GetArticleAdUrls(articleId)
 	//urls := conf.GetUrlsByArticleKey(articleKey)
 	if len(urls) == 0 {
 		ctx.NotFound()

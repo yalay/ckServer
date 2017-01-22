@@ -1,20 +1,12 @@
 package models
 
 import (
+	"fmt"
 	"github.com/jinzhu/gorm"
-	"log"
-
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-var sqliteDb *gorm.DB
-
-func init() {
-	var err error
-	sqliteDb, err = gorm.Open("sqlite3", "ckServer.db")
-	if err != nil {
-		log.Panicf("open db err:%v\n", err)
-	}
+type MyDb struct {
+	*gorm.DB
 }
 
 type Article struct {
@@ -39,38 +31,49 @@ type DownloadLink struct {
 	Url       string `gorm:"not null;unique"`
 }
 
-func init() {
+func NewMyDb() *MyDb {
+	return &MyDb{}
+}
+
+func (m *MyDb) OpenDataBase(dbType, dbFile string) error {
+	myDb, err := gorm.Open(dbType, dbFile)
+	if err != nil {
+		return err
+	}
+
 	var article = Article{}
 	var adLink = AdLink{}
 	var downloadLink = DownloadLink{}
-	if !sqliteDb.HasTable(&article) {
-		sqliteDb.CreateTable(&article)
+	if !myDb.HasTable(&article) {
+		myDb.CreateTable(&article)
 	}
-	if !sqliteDb.HasTable(&adLink) {
-		sqliteDb.CreateTable(&adLink)
-		sqliteDb.Model(&article).Related(&adLink)
+	if !myDb.HasTable(&adLink) {
+		myDb.CreateTable(&adLink)
+		myDb.Model(&article).Related(&adLink)
 	}
-	if !sqliteDb.HasTable(&downloadLink) {
-		sqliteDb.CreateTable(&downloadLink)
-		sqliteDb.Model(&article).Related(&downloadLink)
+	if !myDb.HasTable(&downloadLink) {
+		myDb.CreateTable(&downloadLink)
+		myDb.Model(&article).Related(&downloadLink)
 	}
+
+	m.DB = myDb
+	return nil
 }
 
-func AddArticle(articleId int, title, desc string) {
-	// 存在则更新
-	sqliteDb.Model(Article{ID: articleId}).Updates(Article{Title: title, Desc: desc})
+func (m *MyDb) AddArticle(articleId int, title, desc string) {
+	m.DB.Model(Article{ID: articleId}).Updates(Article{Title: title, Desc: desc})
 }
 
-func AddArticleAdUrl(articleId int, pkgIndex int, adUrl string) {
+func (m *MyDb) AddArticleAdUrl(articleId int, pkgIndex int, adUrl string) error {
 	// 是否已经在数据库中
 	var count int
-	sqliteDb.Model(&AdLink{}).Where("url = ?", adUrl).Count(&count)
+	m.DB.Model(&AdLink{}).Where("url = ?", adUrl).Count(&count)
 	if count > 0 {
-		log.Printf("%s exist. Please delete it first.\n", adUrl)
-		return
+		return fmt.Errorf("%s exist. Please delete it first.\n", adUrl)
 	}
+
 	article := Article{ID: articleId}
-	associton := sqliteDb.Model(&article).Association("AdLinks")
+	associton := m.DB.Model(&article).Association("AdLinks")
 	if associton == nil || associton.Count() == 0 {
 		adLinks := make([]AdLink, 1)
 		adLinks[0].PkgIndex = pkgIndex
@@ -85,20 +88,20 @@ func AddArticleAdUrl(articleId int, pkgIndex int, adUrl string) {
 		})
 		article.AdLinks = adLinks
 	}
-	sqliteDb.Save(&article)
+	m.DB.Save(&article)
+	return nil
 }
 
-func AddArticleDownloadUrl(articleId int, pkgIndex int, downloadUrl string) {
+func (m *MyDb) AddArticleDownloadUrl(articleId int, pkgIndex int, downloadUrl string) error {
 	// 是否已经在数据库中
 	var count int
-	sqliteDb.Model(&DownloadLink{}).Where("url = ?", downloadUrl).Count(&count)
+	m.DB.Model(&DownloadLink{}).Where("url = ?", downloadUrl).Count(&count)
 	if count > 0 {
-		log.Printf("%s exist. Please delete it first.\n", downloadUrl)
-		return
+		return fmt.Errorf("%s exist. Please delete it first.\n", downloadUrl)
 	}
 
 	article := Article{ID: articleId}
-	associton := sqliteDb.Model(&article).Association("DownloadLinks")
+	associton := m.DB.Model(&article).Association("DownloadLinks")
 	if associton == nil || associton.Count() == 0 {
 		downloadLinks := make([]DownloadLink, 1)
 		downloadLinks[0].PkgIndex = pkgIndex
@@ -113,11 +116,12 @@ func AddArticleDownloadUrl(articleId int, pkgIndex int, downloadUrl string) {
 		})
 		article.DownloadLinks = downloadLinks
 	}
-	sqliteDb.Save(&article)
+	m.DB.Save(&article)
+	return nil
 }
 
-func GetArticleAdUrls(id int) map[int][]string {
-	associton := sqliteDb.Model(&Article{ID: id}).Association("AdLinks")
+func (m *MyDb) GetArticleAdUrls(id int) map[int][]string {
+	associton := m.DB.Model(&Article{ID: id}).Association("AdLinks")
 	if associton == nil || associton.Count() == 0 {
 		return nil
 	}
@@ -140,16 +144,8 @@ func GetArticleAdUrls(id int) map[int][]string {
 	return rspUrls
 }
 
-func DeleteAdUrl(url string) {
-	sqliteDb.Where("url = ?", url).Delete(&AdLink{})
-}
-
-func DeleteDownloadUrl(url string) {
-	sqliteDb.Where("url = ?", url).Delete(&DownloadLink{})
-}
-
-func GetArticleDownloadUrls(id int) map[int][]string {
-	associton := sqliteDb.Model(&Article{ID: id}).Association("DownloadLinks")
+func (m *MyDb) GetArticleDownloadUrls(id int) map[int][]string {
+	associton := m.DB.Model(&Article{ID: id}).Association("DownloadLinks")
 	if associton == nil || associton.Count() == 0 {
 		return nil
 	}
@@ -170,4 +166,12 @@ func GetArticleDownloadUrls(id int) map[int][]string {
 	}
 
 	return rspUrls
+}
+
+func (m *MyDb) DeleteAdUrl(url string) {
+	m.DB.Unscoped().Where("url = ?", url).Delete(&AdLink{})
+}
+
+func (m *MyDb) DeleteDownloadUrl(url string) {
+	m.DB.Unscoped().Where("url = ?", url).Delete(&DownloadLink{})
 }
