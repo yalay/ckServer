@@ -29,7 +29,7 @@ func main() {
 	iris.Use(logger.New())
 	iris.UseTemplate(django.New()).Directory(common.TEMPLATE_PATH, ".html")
 
-	controllers.AddArticle(169, "title-169", "desc-169")
+	controllers.AddArticle(169, "title-169", "desc-169", "https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png")
 	controllers.AddArticleAdUrl(169, 0, "http://ad1.com")
 	controllers.AddArticleAdUrl(169, 0, "http://ad1-1.com")
 	controllers.AddArticleAdUrl(169, 1, "http://ad2.com")

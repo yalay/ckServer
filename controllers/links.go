@@ -17,8 +17,8 @@ func init() {
 	}
 }
 
-func AddArticle(articleId int32, title, desc string) {
-	sqliteDb.AddArticle(articleId, title, desc)
+func AddArticle(articleId int32, title, desc, cover string) {
+	sqliteDb.AddArticle(articleId, title, desc, cover)
 }
 
 func AddArticleAdUrl(articleId int32, pkgIndex int32, adUrl string) {
@@ -34,7 +34,9 @@ func AddArticleDownloadUrl(articleId int32, pkgIndex int32, downloadUrl string) 
 		log.Println(err.Error())
 	}
 }
-
+func GetArticleAttrs(id int32) (string, string, string) {
+	return sqliteDb.GetArticleAttrs(id)
+}
 func GetArticleAdUrls(id int32) map[int32][]string {
 	return sqliteDb.GetArticleAdUrls(id)
 }

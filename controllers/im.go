@@ -51,15 +51,17 @@ func ImHandler(ctx *iris.Context) {
 	IncImCount(articleKey)
 	downloadUrls := make([]string, pkgCount)
 	for i, _ := range downloadUrls {
-		downloadUrls[i] = GenEncodedCkUrl(articleId, int32(i+1))
+		downloadUrls[i] = GenEncodedCkAdUrl(articleId, int32(i+1))
 	}
+
+	title, desc, cover := GetArticleAttrs(articleId)
 	params := map[string]interface{}{
 		"id":           articleId,
 		"im":           GetImCount(articleKey),
 		"ck":           GetCkCount(articleKey),
-		"title":        "test-titledddd",
-		"desc":         "test-desc",
-		"cover":        "http://blog.vvniu.com/img/niu.jpg",
+		"title":        title,
+		"desc":         desc,
+		"cover":        cover,
 		"downloadUrls": downloadUrls,
 	}
 	ctx.MustRender("im.html", params)

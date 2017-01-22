@@ -60,11 +60,21 @@ func CkHandler(ctx *iris.Context) {
 	ctx.Redirect(GetCkLeastUrl(ctx.RemoteAddr(), urls[msg.PkgIndex-1]))
 }
 
-// 编码之后的点击链接
-func GenEncodedCkUrl(articleId int32, index int32) string {
+// 编码之后的点击广告跳转链接
+func GenEncodedCkAdUrl(articleId int32, index int32) string {
+	return encodedCkUrl(articleId, index, true)
+}
+
+// 编码之后的点击实际跳转链接
+func GenEncodedCkDownloadUrl(articleId int32, index int32) string {
+	return encodedCkUrl(articleId, index, false)
+}
+
+func encodedCkUrl(articleId int32, index int32, isAd bool) string {
 	msg := &models.Msg{
 		ArticleId: articleId,
 		PkgIndex:  index,
+		NoAd:      !isAd,
 	}
 	data, err := proto.Marshal(msg)
 	if err != nil {
