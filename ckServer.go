@@ -30,14 +30,16 @@ func main() {
 	iris.Use(logger.New())
 	iris.UseTemplate(django.New()).Directory(common.TEMPLATE_PATH, ".html")
 
-	models.UpdateArticle(169, "title-169", "desc-169")
+	models.AddArticle(169, "title-169", "desc-169")
 	models.AddArticleAdUrl(169, 0, "http://ad1.com")
 	models.AddArticleAdUrl(169, 0, "http://ad1-1.com")
 	models.AddArticleAdUrl(169, 1, "http://ad2.com")
 	models.AddArticleAdUrl(169, 1, "http://ad2-1.com")
+	models.DeleteAdUrl("http://ad1-1.com")
 
 	models.AddArticleDownloadUrl(169, 0, "http://localhost/1")
 	models.AddArticleDownloadUrl(169, 1, "http://localhost/2")
+	models.DeleteDownloadUrl("http://localhost/2")
 
 	iris.Get("/", hi)
 	iris.Get("/article-169.html", controllers.ImHandler)

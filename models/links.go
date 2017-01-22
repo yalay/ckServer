@@ -17,12 +17,6 @@ func init() {
 	}
 }
 
-const (
-	kLinkTypeUnknown  = 0
-	kLinkTypeAd       = 1
-	kLinkTypeDownload = 2
-)
-
 type Article struct {
 	ID            int `gorm:"primary_key"`
 	Title         string
@@ -34,15 +28,15 @@ type Article struct {
 type AdLink struct {
 	gorm.Model
 	ArticleID int
-	PkgIndex  int // 分包序号
-	Url       string
+	PkgIndex  int    // 分包序号
+	Url       string `gorm:"not null;unique"`
 }
 
 type DownloadLink struct {
 	gorm.Model
 	ArticleID int
-	PkgIndex  int // 分包序号
-	Url       string
+	PkgIndex  int    // 分包序号
+	Url       string `gorm:"not null;unique"`
 }
 
 func init() {
@@ -62,11 +56,19 @@ func init() {
 	}
 }
 
-func UpdateArticle(articleId int, title, desc string) {
-	sqliteDb.Model(Article{ID: articleId}).Update(Article{Title: title, Desc: desc})
+func AddArticle(articleId int, title, desc string) {
+	// 存在则更新
+	sqliteDb.Model(Article{ID: articleId}).Updates(Article{Title: title, Desc: desc})
 }
 
 func AddArticleAdUrl(articleId int, pkgIndex int, adUrl string) {
+	// 是否已经在数据库中
+	var count int
+	sqliteDb.Model(&AdLink{}).Where("url = ?", adUrl).Count(&count)
+	if count > 0 {
+		log.Printf("%s exist. Please delete it first.\n", adUrl)
+		return
+	}
 	article := Article{ID: articleId}
 	associton := sqliteDb.Model(&article).Association("AdLinks")
 	if associton == nil || associton.Count() == 0 {
@@ -87,6 +89,14 @@ func AddArticleAdUrl(articleId int, pkgIndex int, adUrl string) {
 }
 
 func AddArticleDownloadUrl(articleId int, pkgIndex int, downloadUrl string) {
+	// 是否已经在数据库中
+	var count int
+	sqliteDb.Model(&DownloadLink{}).Where("url = ?", downloadUrl).Count(&count)
+	if count > 0 {
+		log.Printf("%s exist. Please delete it first.\n", downloadUrl)
+		return
+	}
+
 	article := Article{ID: articleId}
 	associton := sqliteDb.Model(&article).Association("DownloadLinks")
 	if associton == nil || associton.Count() == 0 {
@@ -128,6 +138,14 @@ func GetArticleAdUrls(id int) map[int][]string {
 	}
 
 	return rspUrls
+}
+
+func DeleteAdUrl(url string) {
+	sqliteDb.Where("url = ?", url).Delete(&AdLink{})
+}
+
+func DeleteDownloadUrl(url string) {
+	sqliteDb.Where("url = ?", url).Delete(&DownloadLink{})
 }
 
 func GetArticleDownloadUrls(id int) map[int][]string {
