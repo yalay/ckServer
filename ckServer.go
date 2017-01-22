@@ -45,7 +45,8 @@ func main() {
 	iris.Get("/im", controllers.ImHandler)
 	iris.Get("/articles/:id", controllers.ArticleGetHandler)
 	iris.Post("/articles/:id", controllers.ArticlePostHandler)
-	iris.Get("/links/:type/:id", controllers.LinksGetHandler)
-	iris.Post("/links/:type/:id", controllers.LinksPostHandler)
+	iris.Get("/links/:id/:type", controllers.LinksGetHandler)
+	iris.Post("/links/:id/:type", controllers.LinksPostHandler)
+	iris.Get("/encodes/:id/:type/:index", controllers.EncodesGetHandler)
 	iris.Listen(":8080")
 }
