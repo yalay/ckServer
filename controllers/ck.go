@@ -42,15 +42,21 @@ func CkHandler(ctx *iris.Context) {
 		return
 	}
 
-	urls := GetArticleAdUrls(msg.ArticleId)
-	//urls := conf.GetUrlsByArticleKey(articleKey)
+	var urls map[int32][]string
+	if msg.NoAd {
+		urls = GetArticleDownloadUrls(msg.ArticleId)
+		articleKey := genArticleKey(msg.ArticleId)
+		IncCkCount(articleKey)
+	} else {
+		// 通过广告链接跳转
+		urls = GetArticleAdUrls(msg.ArticleId)
+	}
+
 	if len(urls) == 0 {
 		ctx.NotFound()
 		return
 	}
 
-	articleKey := genArticleKey(msg.ArticleId)
-	IncCkCount(articleKey)
 	ctx.Redirect(GetCkLeastUrl(ctx.RemoteAddr(), urls[msg.PkgIndex-1]))
 }
 
