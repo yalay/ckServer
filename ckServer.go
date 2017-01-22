@@ -40,14 +40,12 @@ func main() {
 	controllers.AddArticleDownloadUrl(169, 1, "http://localhost/2")
 	controllers.DeleteDownloadUrl("http://localhost/2")
 
-	iris.Get("/", hi)
 	iris.Get("/article-169.html", controllers.ImHandler)
 	iris.Get("/ck", controllers.CkHandler)
 	iris.Get("/im", controllers.ImHandler)
+	iris.Get("/articles/:id", controllers.ArticleGetHandler)
+	iris.Post("/articles/:id", controllers.ArticlePostHandler)
+	iris.Get("/links/:type/:id", controllers.LinksGetHandler)
+	iris.Post("/links/:type/:id", controllers.LinksPostHandler)
 	iris.Listen(":8080")
-}
-
-func hi(ctx *iris.Context) {
-	ctx.Log("%s", ctx.Request.Referer())
-	ctx.MustRender("center.html", struct{ Name string }{Name: "iris"})
 }

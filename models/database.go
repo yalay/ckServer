@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -10,9 +11,9 @@ type MyDb struct {
 }
 
 type Article struct {
-	ID            int32 `gorm:"primary_key"`
-	AId           int32 `gorm:"index;unique"` // 对应文章生成页id
-	Title         string
+	ID            int32  `gorm:"primary_key"`
+	AId           int32  `gorm:"index;unique"` // 对应文章生成页id
+	Title         string `gorm:"not null"`
 	Desc          string
 	Cover         string
 	AdLinks       []AdLink       // 广告点击跳转链接
@@ -63,9 +64,9 @@ func (m *MyDb) OpenDataBase(dbType, dbFile string) error {
 }
 
 func (m *MyDb) AddArticle(articleId int32, title, desc, cover string) {
-	//m.DB.Model(Article{ID: articleId}).Updates(Article{Title: title, Desc: desc, Cover: cover})
-	var article = Article{AId: articleId}
-	m.DB.First(&article)
+	var article = Article{}
+	m.DB.First(&article, "a_id = ?", articleId)
+	article.AId = articleId
 	article.Title = title
 	article.Desc = desc
 	article.Cover = cover
@@ -77,12 +78,12 @@ func (m *MyDb) AddArticleAdUrl(articleId int32, pkgIndex int32, adUrl string) er
 	var count int
 	m.DB.Model(&AdLink{}).Where("url = ?", adUrl).Count(&count)
 	if count > 0 {
-		return fmt.Errorf("%s exist. Please delete it first.\n", adUrl)
+		return fmt.Errorf("%s exist. Please delete it first.", adUrl)
 	}
 
-	article := Article{AId: articleId}
-	associton := m.DB.First(&article).Association("AdLinks")
-	if associton == nil || associton.Count() == 0 {
+	article := Article{}
+	associton := m.DB.First(&article, "a_id = ?", articleId).Association("AdLinks")
+	if associton == nil || associton.Error != nil {
 		adLinks := make([]AdLink, 1)
 		adLinks[0].PkgIndex = pkgIndex
 		adLinks[0].Url = adUrl
@@ -105,12 +106,12 @@ func (m *MyDb) AddArticleDownloadUrl(articleId int32, pkgIndex int32, downloadUr
 	var count int
 	m.DB.Model(&DownloadLink{}).Where("url = ?", downloadUrl).Count(&count)
 	if count > 0 {
-		return fmt.Errorf("%s exist. Please delete it first.\n", downloadUrl)
+		return fmt.Errorf("%s exist. Please delete it first.", downloadUrl)
 	}
 
-	article := Article{AId: articleId}
-	associton := m.DB.First(&article).Association("DownloadLinks")
-	if associton == nil || associton.Count() == 0 {
+	article := Article{}
+	associton := m.DB.First(&article, "a_id = ?", articleId).Association("DownloadLinks")
+	if associton == nil || associton.Error != nil {
 		downloadLinks := make([]DownloadLink, 1)
 		downloadLinks[0].PkgIndex = pkgIndex
 		downloadLinks[0].Url = downloadUrl
@@ -128,15 +129,15 @@ func (m *MyDb) AddArticleDownloadUrl(articleId int32, pkgIndex int32, downloadUr
 	return nil
 }
 
-func (m *MyDb) GetArticleAttrs(id int32) (string, string, string) {
-	var article = Article{AId: id}
-	m.DB.First(&article)
+func (m *MyDb) GetArticleAttrs(articleId int32) (string, string, string) {
+	var article = Article{}
+	m.DB.First(&article, "a_id = ?", articleId)
 	return article.Title, article.Desc, article.Cover
 }
 
-func (m *MyDb) GetArticleAdUrls(id int32) map[int32][]string {
-	associton := m.DB.First(&Article{AId: id}).Association("AdLinks")
-	if associton == nil || associton.Count() == 0 {
+func (m *MyDb) GetArticleAdUrls(articleId int32) map[int32][]string {
+	associton := m.DB.First(&Article{}, "a_id = ?", articleId).Association("AdLinks")
+	if associton == nil || associton.Error != nil {
 		return nil
 	}
 
@@ -158,9 +159,9 @@ func (m *MyDb) GetArticleAdUrls(id int32) map[int32][]string {
 	return rspUrls
 }
 
-func (m *MyDb) GetArticleDownloadUrls(id int32) map[int32][]string {
-	associton := m.DB.First(&Article{AId: id}).Association("DownloadLinks")
-	if associton == nil || associton.Count() == 0 {
+func (m *MyDb) GetArticleDownloadUrls(articleId int32) map[int32][]string {
+	associton := m.DB.First(&Article{}, "a_id = ?", articleId).Association("DownloadLinks")
+	if associton == nil || associton.Error != nil {
 		return nil
 	}
 
@@ -182,9 +183,9 @@ func (m *MyDb) GetArticleDownloadUrls(id int32) map[int32][]string {
 	return rspUrls
 }
 
-func (m *MyDb) GetArticlePkgCount(id int32) int {
-	associton := m.DB.First(&Article{AId: id}).Association("DownloadLinks")
-	if associton == nil {
+func (m *MyDb) GetArticlePkgCount(articleId int32) int {
+	associton := m.DB.First(&Article{}, "a_id = ?", articleId).Association("DownloadLinks")
+	if associton == nil || associton.Error != nil {
 		return 0
 	}
 	return associton.Count()
