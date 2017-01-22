@@ -20,15 +20,15 @@ type Article struct {
 type AdLink struct {
 	gorm.Model
 	ArticleID int
-	PkgIndex  int    // 分包序号
-	Url       string `gorm:"not null;unique"`
+	PkgIndex  int // 分包序号
+	Url       string
 }
 
 type DownloadLink struct {
 	gorm.Model
 	ArticleID int
-	PkgIndex  int    // 分包序号
-	Url       string `gorm:"not null;unique"`
+	PkgIndex  int // 分包序号
+	Url       string
 }
 
 func NewMyDb() *MyDb {
@@ -169,9 +169,9 @@ func (m *MyDb) GetArticleDownloadUrls(id int) map[int][]string {
 }
 
 func (m *MyDb) DeleteAdUrl(url string) {
-	m.DB.Unscoped().Where("url = ?", url).Delete(&AdLink{})
+	m.DB.Where("url = ?", url).Delete(&AdLink{})
 }
 
 func (m *MyDb) DeleteDownloadUrl(url string) {
-	m.DB.Unscoped().Where("url = ?", url).Delete(&DownloadLink{})
+	m.DB.Where("url = ?", url).Delete(&DownloadLink{})
 }
