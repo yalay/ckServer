@@ -16,22 +16,22 @@ type Article struct {
 	Title         string `gorm:"not null"`
 	Desc          string
 	Cover         string
-	AdLinks       []AdLink       // 广告点击跳转链接
-	DownloadLinks []DownloadLink // 真正的下载链接
+	AdLinks       []AdLink       `gorm:"ForeignKey:AId;AssociationForeignKey:AId"` // 广告点击跳转链接
+	DownloadLinks []DownloadLink `gorm:"ForeignKey:AId;AssociationForeignKey:AId"` // 真正的下载链接
 }
 
 type AdLink struct {
 	gorm.Model
-	ArticleID int32
-	PkgIndex  int32 // 分包序号
-	Url       string
+	AId      int32
+	PkgIndex int32 // 分包序号
+	Url      string
 }
 
 type DownloadLink struct {
 	gorm.Model
-	ArticleID int32
-	PkgIndex  int32 // 分包序号
-	Url       string
+	AId      int32
+	PkgIndex int32 // 分包序号
+	Url      string
 }
 
 func NewMyDb() *MyDb {
@@ -52,11 +52,11 @@ func (m *MyDb) OpenDataBase(dbType, dbFile string) error {
 	}
 	if !myDb.HasTable(&adLink) {
 		myDb.CreateTable(&adLink)
-		myDb.Model(&article).Related(&adLink)
+		myDb.Model(&article).Related(&adLink, "AdLinks")
 	}
 	if !myDb.HasTable(&downloadLink) {
 		myDb.CreateTable(&downloadLink)
-		myDb.Model(&article).Related(&downloadLink)
+		myDb.Model(&article).Related(&downloadLink, "DownloadLinks")
 	}
 
 	m.DB = myDb
@@ -76,7 +76,7 @@ func (m *MyDb) AddArticle(articleId int32, title, desc, cover string) {
 func (m *MyDb) AddArticleAdUrl(articleId int32, pkgIndex int32, adUrl string) error {
 	// 是否已经在数据库中
 	var count int
-	m.DB.Model(&AdLink{}).Where("url = ?", adUrl).Count(&count)
+	m.DB.Where("url = ?", adUrl).Find(&AdLink{}).Count(&count)
 	if count > 0 {
 		return fmt.Errorf("%s exist. Please delete it first.", adUrl)
 	}
@@ -87,9 +87,9 @@ func (m *MyDb) AddArticleAdUrl(articleId int32, pkgIndex int32, adUrl string) er
 	}
 
 	adLink := AdLink{
-		ArticleID: articleId,
-		PkgIndex:  pkgIndex,
-		Url:       adUrl,
+		AId:      articleId,
+		PkgIndex: pkgIndex,
+		Url:      adUrl,
 	}
 
 	m.DB.Save(&adLink)
@@ -99,20 +99,20 @@ func (m *MyDb) AddArticleAdUrl(articleId int32, pkgIndex int32, adUrl string) er
 func (m *MyDb) AddArticleDownloadUrl(articleId int32, pkgIndex int32, downloadUrl string) error {
 	// 是否已经在数据库中
 	var count int
-	m.DB.Model(&DownloadLink{}).Where("url = ?", downloadUrl).Count(&count)
+	m.DB.Where("url = ?", downloadUrl).Find(&DownloadLink{}).Count(&count)
 	if count > 0 {
 		return fmt.Errorf("%s exist. Please delete it first.", downloadUrl)
 	}
 
-	m.DB.Model(&Article{}).Where("a_id = ?", articleId).Count(&count)
+	m.DB.Where("a_id = ?", articleId).Find(&Article{}).Count(&count)
 	if count == 0 {
 		return fmt.Errorf("%d do not exist.", articleId)
 	}
 
 	downloadLink := DownloadLink{
-		ArticleID: articleId,
-		PkgIndex:  pkgIndex,
-		Url:       downloadUrl,
+		AId:      articleId,
+		PkgIndex: pkgIndex,
+		Url:      downloadUrl,
 	}
 
 	m.DB.Save(&downloadLink)
@@ -126,7 +126,7 @@ func (m *MyDb) GetArticleAttrs(articleId int32) (string, string, string) {
 }
 
 func (m *MyDb) GetArticleAdUrls(articleId int32) map[int32][]string {
-	associton := m.DB.Model(&Article{}).Where("a_id = ?", articleId).Association("AdLinks")
+	associton := m.DB.Where("a_id = ?", articleId).First(&Article{}).Association("AdLinks")
 	if associton == nil || associton.Error != nil {
 		return nil
 	}
@@ -150,7 +150,7 @@ func (m *MyDb) GetArticleAdUrls(articleId int32) map[int32][]string {
 }
 
 func (m *MyDb) GetArticleDownloadUrls(articleId int32) map[int32][]string {
-	associton := m.DB.Model(&Article{}).Where("a_id = ?", articleId).Association("DownloadLinks")
+	associton := m.DB.Where("a_id = ?", articleId).First(&Article{}).Association("DownloadLinks")
 	if associton == nil || associton.Error != nil {
 		return nil
 	}
@@ -160,7 +160,6 @@ func (m *MyDb) GetArticleDownloadUrls(articleId int32) map[int32][]string {
 	if len(downloadLinks) == 0 {
 		return nil
 	}
-
 	rspUrls := make(map[int32][]string, 0)
 	for _, downloadLink := range downloadLinks {
 		curIndex := downloadLink.PkgIndex
@@ -174,7 +173,7 @@ func (m *MyDb) GetArticleDownloadUrls(articleId int32) map[int32][]string {
 }
 
 func (m *MyDb) GetArticlePkgCount(articleId int32) int {
-	associton := m.DB.Model(&Article{}).Where("a_id = ?", articleId).Association("DownloadLinks")
+	associton := m.DB.Where("a_id = ?", articleId).Find(&Article{}).Association("DownloadLinks")
 	if associton == nil || associton.Error != nil {
 		return 0
 	}

@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"net/url"
-	"path"
-	"strings"
+	"common"
 
 	"github.com/kataras/iris"
 )
@@ -22,21 +20,15 @@ var emptyParams = map[string]interface{}{
 	"downloadUrls": nil,
 }
 
-// article-169.html
-// index.php?c=Article&id=169
+// im?c=article&id=169
 func ImHandler(ctx *iris.Context) {
-	rawRefer := ctx.Request.Referer()
-	if rawRefer == "" {
+	channel := ctx.URLParam("c")
+	if channel != "article" {
 		ctx.MustRender("im.html", emptyParams)
 		return
 	}
 
-	articleKey := getArticleKeyFromRefer(rawRefer)
-	if articleKey == "" {
-		ctx.MustRender("im.html", emptyParams)
-		return
-	}
-	articleId := getIdFromArticleKey(articleKey)
+	articleId := common.Atoi32(ctx.URLParam("id"))
 	if articleId == 0 {
 		ctx.MustRender("im.html", emptyParams)
 		return
@@ -48,6 +40,7 @@ func ImHandler(ctx *iris.Context) {
 		return
 	}
 
+	articleKey := genArticleKey(articleId)
 	IncImCount(articleKey)
 	downloadUrls := make([]string, pkgCount)
 	for i, _ := range downloadUrls {
@@ -65,28 +58,4 @@ func ImHandler(ctx *iris.Context) {
 		"downloadUrls": downloadUrls,
 	}
 	ctx.MustRender("im.html", params)
-}
-
-func getArticleKeyFromRefer(rawRefer string) string {
-	var articleKey = ""
-	// 伪静态
-	if strings.HasSuffix(rawRefer, ".html") {
-		fileName := path.Base(rawRefer)
-		if !strings.HasPrefix(fileName, kArticleKeyPrefix) {
-			return ""
-		}
-		articleKey = strings.TrimSuffix(fileName, ".html")
-	} else {
-		referUrl, err := url.Parse(rawRefer)
-		if err != nil {
-			return ""
-		}
-		referValues := referUrl.Query()
-		className := strings.ToLower(referValues.Get("c"))
-		if className != "article" {
-			return ""
-		}
-		articleKey = kArticleKeyPrefix + referValues.Get("id")
-	}
-	return articleKey
 }
