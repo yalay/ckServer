@@ -40,9 +40,8 @@ func main() {
 	controllers.AddArticleDownloadUrl(169, 1, "http://localhost/2")
 	controllers.DeleteDownloadUrl("http://localhost/2")
 
-	iris.Get("/ck", controllers.CkHandler)
-	iris.Get("/im", controllers.ImHandler)
-
+	iris.Get("/ck/:info", controllers.CkHandler)
+	iris.Get("/im/:type/:id", controllers.ImHandler)
 	iris.Get("/articles/:id", controllers.ArticleGetHandler)
 	iris.Post("/articles/:id", controllers.ArticlePostHandler)
 	iris.Get("/links/:id/:type", controllers.LinksGetHandler)

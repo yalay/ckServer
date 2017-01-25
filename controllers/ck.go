@@ -15,10 +15,10 @@ const (
 	KPathCk = "/ck"
 )
 
-// /ck?aid=123&idx=1
+// /ck/:info
 // idx从1开始计数，0是非法
 func CkHandler(ctx *iris.Context) {
-	info := ctx.URLParam("info")
+	info := ctx.Param("info")
 	if info == "" {
 		ctx.NotFound()
 		return

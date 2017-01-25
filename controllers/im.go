@@ -20,15 +20,15 @@ var emptyParams = map[string]interface{}{
 	"downloadUrls": nil,
 }
 
-// im?c=article&id=169
+// im/article/169
 func ImHandler(ctx *iris.Context) {
-	channel := ctx.URLParam("c")
+	channel := ctx.Param("type")
 	if channel != "article" {
 		ctx.MustRender("im.html", emptyParams)
 		return
 	}
 
-	articleId := common.Atoi32(ctx.URLParam("id"))
+	articleId := common.Atoi32(ctx.Param("id"))
 	if articleId == 0 {
 		ctx.MustRender("im.html", emptyParams)
 		return
