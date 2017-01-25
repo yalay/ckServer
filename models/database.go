@@ -2,11 +2,13 @@ package models
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/jinzhu/gorm"
 )
 
 type MyDb struct {
+	sync.RWMutex
 	*gorm.DB
 }
 
@@ -64,16 +66,20 @@ func (m *MyDb) OpenDataBase(dbType, dbFile string) error {
 }
 
 func (m *MyDb) AddArticle(articleId int32, title, desc, cover string) {
+	m.Lock()
 	var article = Article{}
-	m.DB.First(&article, "a_id = ?", articleId)
+	m.DB.Where("a_id = ?", articleId).Find(&article)
 	article.AId = articleId
 	article.Title = title
 	article.Desc = desc
 	article.Cover = cover
 	m.DB.Save(&article)
+	m.Unlock()
 }
 
 func (m *MyDb) AddArticleAdUrl(articleId int32, pkgIndex int32, adUrl string) error {
+	m.Lock()
+	defer m.Unlock()
 	// 是否已经在数据库中
 	var count int
 	m.DB.Where("url = ?", adUrl).Find(&AdLink{}).Count(&count)
@@ -81,7 +87,7 @@ func (m *MyDb) AddArticleAdUrl(articleId int32, pkgIndex int32, adUrl string) er
 		return fmt.Errorf("%s exist. Please delete it first.", adUrl)
 	}
 
-	m.DB.Model(&Article{}).Where("a_id = ?", articleId).Count(&count)
+	m.DB.Where("a_id = ?", articleId).Find(&Article{}).Count(&count)
 	if count == 0 {
 		return fmt.Errorf("%d do not exist.", articleId)
 	}
@@ -97,6 +103,8 @@ func (m *MyDb) AddArticleAdUrl(articleId int32, pkgIndex int32, adUrl string) er
 }
 
 func (m *MyDb) AddArticleDownloadUrl(articleId int32, pkgIndex int32, downloadUrl string) error {
+	m.Lock()
+	defer m.Unlock()
 	// 是否已经在数据库中
 	var count int
 	m.DB.Where("url = ?", downloadUrl).Find(&DownloadLink{}).Count(&count)
@@ -120,12 +128,16 @@ func (m *MyDb) AddArticleDownloadUrl(articleId int32, pkgIndex int32, downloadUr
 }
 
 func (m *MyDb) GetArticleAttrs(articleId int32) (string, string, string) {
+	m.RLock()
 	var article = Article{}
 	m.DB.Where("a_id = ?", articleId).First(&article)
+	m.RUnlock()
 	return article.Title, article.Desc, article.Cover
 }
 
 func (m *MyDb) GetArticleAdUrls(articleId int32) map[int32][]string {
+	m.RLock()
+	defer m.RUnlock()
 	associton := m.DB.Where("a_id = ?", articleId).First(&Article{}).Association("AdLinks")
 	if associton == nil || associton.Error != nil {
 		return nil
@@ -150,6 +162,8 @@ func (m *MyDb) GetArticleAdUrls(articleId int32) map[int32][]string {
 }
 
 func (m *MyDb) GetArticleDownloadUrls(articleId int32) map[int32][]string {
+	m.RLock()
+	defer m.RUnlock()
 	associton := m.DB.Where("a_id = ?", articleId).First(&Article{}).Association("DownloadLinks")
 	if associton == nil || associton.Error != nil {
 		return nil
@@ -173,6 +187,8 @@ func (m *MyDb) GetArticleDownloadUrls(articleId int32) map[int32][]string {
 }
 
 func (m *MyDb) GetArticlePkgCount(articleId int32) int {
+	m.RLock()
+	defer m.RUnlock()
 	associton := m.DB.Where("a_id = ?", articleId).Find(&Article{}).Association("DownloadLinks")
 	if associton == nil || associton.Error != nil {
 		return 0
@@ -181,9 +197,13 @@ func (m *MyDb) GetArticlePkgCount(articleId int32) int {
 }
 
 func (m *MyDb) DeleteAdUrl(url string) {
+	m.Lock()
 	m.DB.Where("url = ?", url).Delete(&AdLink{})
+	m.Unlock()
 }
 
 func (m *MyDb) DeleteDownloadUrl(url string) {
+	m.Lock()
 	m.DB.Where("url = ?", url).Delete(&DownloadLink{})
+	m.Unlock()
 }
