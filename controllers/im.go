@@ -15,7 +15,7 @@ var emptyParams = map[string]interface{}{
 	"im":           0,
 	"ck":           0,
 	"title":        "未知标题",
-	"desc":         "没找到对应下载内容，请重新从文章页点击下载",
+	"desc":         "没找到作品下载内容，请从文章页点击下载",
 	"cover":        "http://blog.vvniu.com/img/niu.jpg",
 	"downloadUrls": nil,
 }
