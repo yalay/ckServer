@@ -83,5 +83,5 @@ func encodedCkUrl(articleId int32, index int32, isAd bool) string {
 	}
 
 	info := url.QueryEscape(base64.StdEncoding.EncodeToString(data))
-	return fmt.Sprintf("%s?info=%s", KPathCk, info)
+	return fmt.Sprintf("%s/%s", KPathCk, info)
 }
