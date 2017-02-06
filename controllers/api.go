@@ -32,8 +32,21 @@ func ArticlePostHandler(ctx *iris.Context) {
 		return
 	}
 	title := ctx.FormValue("title")
-	desc := ctx.FormValue("desc")
+	if title == "" {
+		ctx.Writef("title required")
+		return
+	}
+
 	cover := ctx.FormValue("cover")
+	if cover == "" {
+		ctx.Writef("cover required")
+		return
+	}
+
+	desc := ctx.FormValue("desc")
+	if desc == "" {
+		desc = title
+	}
 	sqliteDb.AddArticle(articleId, title, desc, cover)
 	ctx.Writef("add success")
 }
@@ -79,6 +92,11 @@ func LinksPostHandler(ctx *iris.Context) {
 
 	var err error
 	pkgIndex := common.Atoi32(ctx.FormValue("index"))
+	if pkgIndex <= 0 {
+		ctx.Writef("index must be bigger than 0")
+		return
+	}
+
 	linkType := ctx.Param("type")
 	switch linkType {
 	case kLinkTypeAd:

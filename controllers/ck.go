@@ -57,7 +57,7 @@ func CkHandler(ctx *iris.Context) {
 		return
 	}
 
-	ctx.Redirect(GetCkLeastUrl(ctx.RemoteAddr(), urls[msg.PkgIndex-1]))
+	ctx.Redirect(GetCkLeastUrl(ctx.RemoteAddr(), urls[msg.PkgIndex]))
 }
 
 // 编码之后的点击广告跳转链接
