@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/iris-contrib/middleware/logger"
-	"github.com/kataras/go-template/django"
+	"github.com/kataras/go-template/html"
 	"github.com/kataras/iris"
 )
 
@@ -27,7 +27,7 @@ func main() {
 	iris.StaticWeb("/fonts", common.TEMPLATE_PATH+"/fonts")
 
 	iris.Use(logger.New())
-	iris.UseTemplate(django.New()).Directory(common.TEMPLATE_PATH, ".html")
+	iris.UseTemplate(html.New(html.Config{Layout: iris.NoLayout})).Directory(common.TEMPLATE_PATH, ".html")
 
 	iris.Get("/ck/:info", controllers.CkHandler)
 	iris.Get("/im/:type/:id", controllers.ImHandler)

@@ -10,14 +10,24 @@ const (
 	KPathIm = "/im"
 )
 
-var emptyParams = map[string]interface{}{
-	"id":           0,
-	"im":           0,
-	"ck":           0,
-	"title":        "未知标题",
-	"desc":         "没找到作品下载内容，请从文章页点击下载",
-	"cover":        "http://blog.vvniu.com/img/niu.jpg",
-	"downloadUrls": nil,
+type imPageParams struct {
+	Id           int32
+	Im           int
+	Ck           int
+	Title        string
+	Desc         string
+	Cover        string
+	DownloadUrls []string
+}
+
+var emptyParams = imPageParams{
+	Id:           0,
+	Im:           0,
+	Ck:           0,
+	Title:        "未知标题",
+	Desc:         "没找到作品下载内容，请从文章页点击下载",
+	Cover:        "http://blog.vvniu.com/img/niu.jpg",
+	DownloadUrls: nil,
 }
 
 // im/article/169
@@ -48,14 +58,14 @@ func ImHandler(ctx *iris.Context) {
 	}
 
 	title, desc, cover := GetArticleAttrs(articleId)
-	params := map[string]interface{}{
-		"id":           articleId,
-		"im":           GetImCount(articleKey),
-		"ck":           GetCkCount(articleKey),
-		"title":        title,
-		"desc":         desc,
-		"cover":        cover,
-		"downloadUrls": downloadUrls,
+	params := imPageParams{
+		Id:           articleId,
+		Im:           GetImCount(articleKey),
+		Ck:           GetCkCount(articleKey),
+		Title:        title,
+		Desc:         desc,
+		Cover:        cover,
+		DownloadUrls: downloadUrls,
 	}
 	ctx.MustRender("im.html", params)
 }

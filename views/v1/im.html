@@ -1,8 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
+<html lang="cn">
 <head>
     <meta charset="UTF-8">
-    <title>{{title}} 下载高清作品原图</title>
+    <title>{{.Title}} 下载高清作品原图</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="stylesheet" href="/css/amazeui.min.css">
@@ -10,6 +9,7 @@
     <link rel="stylesheet" href="/css/animate.min.css">
 </head>
 <body>
+
     <header class="am-topbar am-topbar-inverse">
         <div class="amz-container">
             <h1 class="am-topbar-brand">
@@ -23,47 +23,63 @@
         <div class="am-u-sm-12">
             <div class="ztlb_nr_block">
                 <div class="ztlb_nr_block_l">
-                    <img src="{{cover}}" alt="{{title}}">
+                    <img src="{{.Cover}}" alt="{{.Title}}">
                 </div>
                 <div class="ztlb_nr_block_r">
                     <div class="ztlb_nr_block_r_info">
                         <div class="ztlb_nr_block_r_info_l">
-                            <div class="ztlb_nr_block_r_info_num">{{im}}</div>
+                            <div class="ztlb_nr_block_r_info_num">{{.Im}}</div>
                             <div>今日预览数</div>
                         </div>
                         <div class="ztlb_nr_block_r_info_r">
-                            <div class="ztlb_nr_block_r_info_num">{{ck}}</div>
+                            <div class="ztlb_nr_block_r_info_num">{{.Ck}}</div>
                             <div>今日下载数</div>
                         </div>
                     </div>
-                    <div class="ztlb_nr_block_r_title">{{title}}</div>
-                    <span class="ztlb_nr_block_r_nr">{{desc}}...</span>
+                    <div class="ztlb_nr_block_r_title">{{.Title}}</div>
+                    <span class="ztlb_nr_block_r_nr">{{.Desc}}...</span>
                     <div class="ztlb_nr_block_r_user">
-                        <span>下载地址：</span>
-                        {% for url in downloadUrls %}
-                        <a class="am-btn am-btn-primary" href={{url}} target="_blank">
-                            {{title}} <i class="am-icon-cloud-download"></i>
-                        </a>
-                        {% endfor %}
+                        <span>下载地址：</span></p>
+                        {{if gt (len .DownloadUrls) 1 }}
+                            {{range $index, $url := .DownloadUrls}}
+                                <a class="am-btn am-btn-primary" href="{{$url}}" target="_blank">
+                                    <i class="am-icon-cloud-download"></i>{{$.Title}}{{printf ".z0%v" $index }}
+                                </a>
+                            {{end}}
+                        {{else}}
+                            {{range $url := .DownloadUrls}}
+                            <a class="am-btn am-btn-primary" href="{{$url}}" target="_blank">
+                                <i class="am-icon-cloud-download"></i>{{$.Title}}.zip
+                            </a>
+                            {{end}}
+                        {{end}}
                     </div>
-
                 </div>
             </div>
             <div class="ztlb_nr_block_r_info_copy_bg">
-                <span>今日预览数：{{im}}</span>
-                <span>今日下载数：{{ck}}</span>
+                <span>今日预览数：{{.Im}}</span>
+                <span>今日下载数：{{.Ck}}</span>
             </div>
             <div class="ztlb_nr_block_r_info_copy"></div>
         </div>
     </div>
     <div class="ztlb_nr_block_r_user ztlb_nr_block_r_user_copy">
-        <span>下载地址：</span>
-        {% for url in downloadUrls %}
-        <a class="am-btn am-btn-primary" href={{url}} target="_blank">
-            {{title}} <i class="am-icon-cloud-download"></i>
-        </a>
-        {% endfor %}
+        <span>下载地址：</span></p>
+        {{if gt (len .DownloadUrls) 1 }}
+            {{range $index, $url := .DownloadUrls}}
+                <a class="am-btn am-btn-primary" href="{{$url}}" target="_blank">
+                    <i class="am-icon-cloud-download"></i>{{$.Title}}{{printf ".z0%v" $index }}
+                </a>
+            {{end}}
+        {{else}}
+            {{range $url := .DownloadUrls}}
+            <a class="am-btn am-btn-primary" href="{{$url}}" target="_blank">
+                <i class="am-icon-cloud-download"></i>{{$.Title}}.zip
+            </a>
+            {{end}}
+        {{end}}
     </div>
+
     <script src="/js/jquery.min.js"></script>
     <script src="/js/amazeui.min.js"></script>
 </body>
