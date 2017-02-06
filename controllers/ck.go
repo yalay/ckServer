@@ -42,6 +42,7 @@ func CkHandler(ctx *iris.Context) {
 		return
 	}
 
+	log.Printf("msg:%+v\n", msg)
 	var urls map[int32][]string
 	if msg.NoAd {
 		urls = GetArticleDownloadUrls(msg.ArticleId)

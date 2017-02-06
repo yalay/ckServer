@@ -38,8 +38,8 @@
                     </div>
                     <div class="ztlb_nr_block_r_title">{{.Title}}</div>
                     <span class="ztlb_nr_block_r_nr">{{.Desc}}...</span>
-                    <div class="ztlb_nr_block_r_user">
-                        <span>下载地址：</span></p>
+                    <div id="myblock1" class="ztlb_nr_block_r_user">
+                        <span>下载地址：（经过几秒广告后点击跳过广告按钮才进入到网盘下载）</span></p>
                         {{if gt (len .DownloadUrls) 1 }}
                             {{range $index, $url := .DownloadUrls}}
                                 <a class="am-btn am-btn-primary" href="{{$url}}" target="_blank">
@@ -54,33 +54,25 @@
                             {{end}}
                         {{end}}
                     </div>
+                    <div id="myblock2" style="display: none;">
+                        <blockquote>
+                            <p>检测到本站广告被拦截，因此下载地址也自动屏蔽。请关闭广告拦截插件后刷新本页面就可以看到下载地址了。</p>
+                            <small>站长提示 —— 疼美眉网</small>
+                        </blockquote>
+                    </div>
                 </div>
             </div>
-            <div class="ztlb_nr_block_r_info_copy_bg">
-                <span>今日预览数：{{.Im}}</span>
-                <span>今日下载数：{{.Ck}}</span>
-            </div>
-            <div class="ztlb_nr_block_r_info_copy"></div>
         </div>
-    </div>
-    <div class="ztlb_nr_block_r_user ztlb_nr_block_r_user_copy">
-        <span>下载地址：</span></p>
-        {{if gt (len .DownloadUrls) 1 }}
-            {{range $index, $url := .DownloadUrls}}
-                <a class="am-btn am-btn-primary" href="{{$url}}" target="_blank">
-                    <i class="am-icon-cloud-download"></i>{{$.Title}}{{printf ".z0%v" $index }}
-                </a>
-            {{end}}
-        {{else}}
-            {{range $url := .DownloadUrls}}
-            <a class="am-btn am-btn-primary" href="{{$url}}" target="_blank">
-                <i class="am-icon-cloud-download"></i>{{$.Title}}.zip
-            </a>
-            {{end}}
-        {{end}}
     </div>
 
     <script src="/js/jquery.min.js"></script>
     <script src="/js/amazeui.min.js"></script>
+    <script src="/js/ads.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        if(!document.getElementById('OdxcQvuwqisY')){
+            document.getElementById('myblock1').style.display='none';
+            document.getElementById('myblock2').style.display='block';
+        }
+    </script>
 </body>
 </html>
