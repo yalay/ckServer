@@ -23,23 +23,13 @@
         <div class="am-u-sm-12">
             <div class="ztlb_nr_block">
                 <div class="ztlb_nr_block_l">
-                    <img src="{{.Cover}}" alt="{{.Title}}">
+                    <img src="{{.Cover}}?s=75x150" alt="{{.Title}}">
                 </div>
                 <div class="ztlb_nr_block_r">
-                    <div class="ztlb_nr_block_r_info">
-                        <div class="ztlb_nr_block_r_info_l">
-                            <div class="ztlb_nr_block_r_info_num">{{.Im}}</div>
-                            <div>今日预览数</div>
-                        </div>
-                        <div class="ztlb_nr_block_r_info_r">
-                            <div class="ztlb_nr_block_r_info_num">{{.Ck}}</div>
-                            <div>今日下载数</div>
-                        </div>
-                    </div>
                     <div class="ztlb_nr_block_r_title">{{.Title}}</div>
                     <span class="ztlb_nr_block_r_nr">{{.Desc}}...</span>
                     <div id="myblock1" class="ztlb_nr_block_r_user">
-                        <span>下载地址：（经过几秒广告后点击跳过广告按钮才进入到网盘下载）</span></p>
+                        <span>下载地址：（先点击跳过广告按钮进入网盘，点击文件名即可下载）</span></p>
                         {{if gt (len .DownloadUrls) 1 }}
                             {{range $index, $url := .DownloadUrls}}
                                 <a class="am-btn am-btn-primary" href="{{$url}}" target="_blank">
