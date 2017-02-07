@@ -33,13 +33,13 @@
                         {{if gt (len .DownloadUrls) 1 }}
                             {{range $index, $url := .DownloadUrls}}
                                 <a class="am-btn am-btn-primary" href="{{$url}}" target="_blank">
-                                    <i class="am-icon-cloud-download"></i>{{$.Title}}{{printf ".z0%v" $index }}
+                                    <i class="am-icon-cloud-download"></i>{{$.STitle}}{{printf ".z0%v" $index }}
                                 </a>
                             {{end}}
                         {{else}}
                             {{range $url := .DownloadUrls}}
                             <a class="am-btn am-btn-primary" href="{{$url}}" target="_blank">
-                                <i class="am-icon-cloud-download"></i>{{$.Title}}.zip
+                                <i class="am-icon-cloud-download"></i>{{$.STitle}}.zip
                             </a>
                             {{end}}
                         {{end}}

@@ -16,6 +16,7 @@ type Article struct {
 	ID            int32  `gorm:"primary_key"`
 	AId           int32  `gorm:"index;unique"` // 对应文章生成页id
 	Title         string `gorm:"not null"`
+	STitle        string `gorm:"not null"` // 文章英文短标题
 	Desc          string
 	Cover         string
 	AdLinks       []AdLink       `gorm:"ForeignKey:AId;AssociationForeignKey:AId"` // 广告点击跳转链接
@@ -65,12 +66,13 @@ func (m *MyDb) OpenDataBase(dbType, dbFile string) error {
 	return nil
 }
 
-func (m *MyDb) AddArticle(articleId int32, title, desc, cover string) {
+func (m *MyDb) AddArticle(articleId int32, title, sTitle, desc, cover string) {
 	m.Lock()
 	var article = Article{}
 	m.DB.Where("a_id = ?", articleId).Find(&article)
 	article.AId = articleId
 	article.Title = title
+	article.STitle = sTitle
 	article.Desc = desc
 	article.Cover = cover
 	m.DB.Save(&article)
@@ -127,12 +129,12 @@ func (m *MyDb) AddArticleDownloadUrl(articleId int32, pkgIndex int32, downloadUr
 	return nil
 }
 
-func (m *MyDb) GetArticleAttrs(articleId int32) (string, string, string) {
+func (m *MyDb) GetArticleAttrs(articleId int32) (string, string, string, string) {
 	m.RLock()
 	var article = Article{}
 	m.DB.Where("a_id = ?", articleId).First(&article)
 	m.RUnlock()
-	return article.Title, article.Desc, article.Cover
+	return article.Title, article.STitle, article.Desc, article.Cover
 }
 
 func (m *MyDb) GetArticleAdUrls(articleId int32) map[int32][]string {

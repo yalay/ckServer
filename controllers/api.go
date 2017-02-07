@@ -17,12 +17,12 @@ func ArticleGetHandler(ctx *iris.Context) {
 		ctx.NotFound()
 		return
 	}
-	title, desc, cover := sqliteDb.GetArticleAttrs(articleId)
+	title, sTitle, desc, cover := sqliteDb.GetArticleAttrs(articleId)
 	if title == "" {
 		ctx.NotFound()
 		return
 	}
-	ctx.Writef("title:%s desc:%s cover:%s", title, desc, cover)
+	ctx.Writef("title:%s sTitle:%s desc:%s cover:%s", title, sTitle, desc, cover)
 }
 
 func ArticlePostHandler(ctx *iris.Context) {
@@ -32,8 +32,9 @@ func ArticlePostHandler(ctx *iris.Context) {
 		return
 	}
 	title := ctx.FormValue("title")
-	if title == "" {
-		ctx.Writef("title required")
+	sTitle := ctx.FormValue("stitle")
+	if title == "" || sTitle == "" {
+		ctx.Writef("title and sTitle required")
 		return
 	}
 
@@ -47,7 +48,7 @@ func ArticlePostHandler(ctx *iris.Context) {
 	if desc == "" {
 		desc = title
 	}
-	sqliteDb.AddArticle(articleId, title, desc, cover)
+	sqliteDb.AddArticle(articleId, title, sTitle, desc, cover)
 	ctx.Writef("add success")
 }
 

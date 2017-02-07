@@ -15,19 +15,16 @@ type imPageParams struct {
 	Im           int
 	Ck           int
 	Title        string
+	STitle       string
 	Desc         string
 	Cover        string
 	DownloadUrls []string
 }
 
 var emptyParams = imPageParams{
-	Id:           0,
-	Im:           0,
-	Ck:           0,
-	Title:        "未知标题",
-	Desc:         "没找到作品下载内容，请从文章页点击下载",
-	Cover:        "http://blog.vvniu.com/img/niu.jpg",
-	DownloadUrls: nil,
+	Title: "未知标题",
+	Desc:  "没找到作品下载内容，请从文章页点击下载",
+	Cover: "http://blog.vvniu.com/img/niu.jpg",
 }
 
 // im/article/169
@@ -57,12 +54,13 @@ func ImHandler(ctx *iris.Context) {
 		downloadUrls[i] = GenEncodedCkAdUrl(articleId, int32(i+1))
 	}
 
-	title, desc, cover := GetArticleAttrs(articleId)
+	title, sTitle, desc, cover := GetArticleAttrs(articleId)
 	params := imPageParams{
 		Id:           articleId,
 		Im:           GetImCount(articleKey),
 		Ck:           GetCkCount(articleKey),
 		Title:        title,
+		STitle:       sTitle,
 		Desc:         desc,
 		Cover:        cover,
 		DownloadUrls: downloadUrls,
