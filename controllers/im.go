@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"common"
+	"conf"
 
 	"github.com/kataras/iris"
 )
@@ -22,13 +23,19 @@ type imPageParams struct {
 }
 
 var emptyParams = imPageParams{
-	Title: "未知标题",
+	Title: "请从文章页点击下载",
 	Desc:  "没找到作品下载内容，请从文章页点击下载",
 	Cover: "http://blog.vvniu.com/img/niu.jpg",
 }
 
 // im/article/169
 func ImHandler(ctx *iris.Context) {
+	referUrl := ctx.Request.Referer()
+	if !conf.IsInWhiteList(referUrl) {
+		ctx.MustRender("im.html", emptyParams)
+		return
+	}
+
 	channel := ctx.Param("type")
 	if channel != "article" {
 		ctx.MustRender("im.html", emptyParams)

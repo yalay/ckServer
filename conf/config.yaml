@@ -1,18 +1,4 @@
-# production: beijingnew: adserver config
 
-downloadurls:
-  article-169:
-    -
-      - http://test1.com
-      - http://test1-1.com
-    -
-      - http://test2.com
-      - http://test2-1.com
-  article-170:
-    -
-      - http://test3.com
-      - http://test3-1.com
-    -
-      - http://test4.com
-      - http://test4-1.com
+whitedomains:
+  - test.com
 

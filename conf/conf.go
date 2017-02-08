@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-yaml/yaml"
@@ -13,6 +14,7 @@ import (
 var gConfig = &Config{}
 
 type Config struct {
+	whiteRefers []string
 }
 
 func init() {
@@ -21,6 +23,19 @@ func init() {
 	flag.Parse()
 
 	reloadConf(configFile)
+}
+
+func IsInWhiteList(url string) bool {
+	if len(gConfig.whiteRefers) == 0 {
+		return true
+	}
+
+	for _, domain := range gConfig.whiteRefers {
+		if strings.Contains(url, domain) {
+			return true
+		}
+	}
+	return false
 }
 
 func reloadConf(configFile string) {
