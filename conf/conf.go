@@ -14,23 +14,22 @@ import (
 var gConfig = &Config{}
 
 type Config struct {
-	whiteRefers []string
+	WhiteRefers []string
 }
 
 func init() {
 	var configFile string
 	flag.StringVar(&configFile, "c", "conf/config.yaml", "conf file path")
-	flag.Parse()
 
 	reloadConf(configFile)
 }
 
 func IsInWhiteList(url string) bool {
-	if len(gConfig.whiteRefers) == 0 {
+	if len(gConfig.WhiteRefers) == 0 {
 		return true
 	}
 
-	for _, domain := range gConfig.whiteRefers {
+	for _, domain := range gConfig.WhiteRefers {
 		if strings.Contains(url, domain) {
 			return true
 		}
