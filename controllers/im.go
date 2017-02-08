@@ -25,7 +25,7 @@ type imPageParams struct {
 var emptyParams = imPageParams{
 	Title: "请从文章页点击下载",
 	Desc:  "没找到作品下载内容，请从文章页点击下载",
-	Cover: "http://blog.vvniu.com/img/niu.jpg",
+	Cover: "/img/logo.png",
 }
 
 // im/article/169
@@ -38,19 +38,19 @@ func ImHandler(ctx *iris.Context) {
 
 	channel := ctx.Param("type")
 	if channel != "article" {
-		ctx.MustRender("im.html", emptyParams)
+		ctx.EmitError(iris.StatusNotFound)
 		return
 	}
 
 	articleId := common.Atoi32(ctx.Param("id"))
 	if articleId == 0 {
-		ctx.MustRender("im.html", emptyParams)
+		ctx.EmitError(iris.StatusNotFound)
 		return
 	}
 
 	pkgCount := GetArticlePkgCount(articleId)
 	if pkgCount == 0 {
-		ctx.MustRender("im.html", emptyParams)
+		ctx.EmitError(iris.StatusNotFound)
 		return
 	}
 
