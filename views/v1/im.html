@@ -4,6 +4,7 @@
     <title>{{.Title}} 下载高清作品原图</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="alternate icon" type="image/png" href="/img/favicon.png">
     <link rel="stylesheet" href="//cdn.amazeui.org/amazeui/2.7.2/css/amazeui.min.css">
     <link rel="stylesheet" href="/css/petshow.css?6">
     <link rel="stylesheet" href="/css/animate.min.css">
@@ -29,7 +30,7 @@
                     <div class="ztlb_nr_block_r_title">{{.Title}}</div>
                     <span class="ztlb_nr_block_r_nr">{{.Desc}}...</span>
                     <div id="myblock1" class="ztlb_nr_block_r_user">
-                        <span>下载地址：（先点击跳过广告按钮进入网盘，点击文件名即可下载）</span></p>
+                        <span>下载地址：（先点击跳过广告按钮进入网盘，之后点击压缩包图标下面按钮即可下载）</span></p>
                         {{if gt (len .DownloadUrls) 1 }}
                             {{range $index, $url := .DownloadUrls}}
                                 <a class="am-btn am-btn-primary" href="{{$url}}" target="_blank">
@@ -49,6 +50,7 @@
                         <blockquote>
                             <p>本站只有在下载作品时才会有广告，正常浏览作品没有任何广告。</p>
                             <p>检测到下载作品时广告被拦截，因此下载地址也自动屏蔽。请关闭广告拦截插件后刷新本页面就可以看到下载地址了。</p>
+                            <p>为保证正常跳转到下载页面，跳转过程中也需要关闭广告拦截插件。</p>
                             <small>站长提示 —— 疼美眉网</small>
                         </blockquote>
                     </div>
