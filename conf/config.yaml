@@ -1,4 +1,9 @@
 
 whiterefers:
-  - test.com
+  - "test1.com"
+  - "test2.com"
+linksweight:
+  - "test1.com"
+  - "test2.com"
+
 

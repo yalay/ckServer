@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"common"
 	"flag"
 	"io/ioutil"
 	"log"
@@ -15,6 +16,7 @@ var gConfig = &Config{}
 
 type Config struct {
 	WhiteRefers []string
+	LinksWeight []string // 按索引排序，越往前权重越大
 }
 
 func init() {
@@ -35,6 +37,24 @@ func IsInWhiteList(url string) bool {
 		}
 	}
 	return false
+}
+
+func GetHighestWeightLink(candidateLinks common.Set) string {
+	if candidateLinks.Size() == 0 {
+		return ""
+	}
+
+	if candidateLinks.Size() == 1 || len(gConfig.LinksWeight) == 0 {
+		return candidateLinks.Random().(string)
+	}
+
+	for _, link := range gConfig.LinksWeight {
+		if candidateLinks.Contains(link) {
+			return link
+		}
+	}
+
+	return candidateLinks.Random().(string)
 }
 
 func reloadConf(configFile string) {
