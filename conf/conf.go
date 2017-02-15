@@ -5,6 +5,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -48,9 +49,19 @@ func GetHighestWeightLink(candidateLinks common.Set) string {
 		return candidateLinks.Random().(string)
 	}
 
+	hostsLink := make(map[string]string, candidateLinks.Size())
+	for link := range candidateLinks.Iter() {
+		linkRawUrl := link.(string)
+		linkUrl, err := url.Parse(linkRawUrl)
+		if err != nil {
+			continue
+		}
+		hostsLink[linkUrl.Host] = linkRawUrl
+	}
+
 	for _, link := range gConfig.LinksWeight {
-		if candidateLinks.Contains(link) {
-			return link
+		if selectedLink, ok := hostsLink[link]; ok {
+			return selectedLink
 		}
 	}
 
