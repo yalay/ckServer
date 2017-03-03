@@ -28,10 +28,10 @@ var emptyParams = imPageParams{
 	Cover: "/img/logo.png",
 }
 
-// im/article/169
+// im/articles/169
 func ImHandler(ctx *iris.Context) {
 	channel := ctx.Param("type")
-	if channel != "article" {
+	if channel != "articles" {
 		ctx.EmitError(iris.StatusNotFound)
 		return
 	}
