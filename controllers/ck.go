@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"conf"
 	"encoding/base64"
 	"fmt"
 	"log"
@@ -43,14 +44,14 @@ func CkHandler(ctx *iris.Context) {
 	}
 
 	log.Printf("msg:%+v\n", msg)
-	var urls map[int32][]string
+	var urls []string
 	if msg.NoAd {
-		urls = GetArticleDownloadUrls(msg.ArticleId)
+		urls = conf.GetArticleDlLinks(msg.ArticleId)
 		articleKey := genArticleKey(msg.ArticleId)
 		IncCkCount(articleKey)
 	} else {
 		// 通过广告链接跳转
-		urls = GetArticleAdUrls(msg.ArticleId)
+		urls = conf.GetArticleAdLinks(msg.ArticleId)
 	}
 
 	if len(urls) == 0 {
@@ -58,7 +59,7 @@ func CkHandler(ctx *iris.Context) {
 		return
 	}
 
-	ctx.Redirect(GetCkLeastUrl(ctx.RemoteAddr(), urls[msg.PkgIndex]))
+	ctx.Redirect(GetCkLeastUrl(ctx.RemoteAddr(), urls))
 }
 
 // 编码之后的点击广告跳转链接

@@ -1,9 +1,13 @@
+# version 0.1
+#
+#import articles-001.yaml
+#import articles-002.yaml
 
 whiterefers:
   - "test1.com"
   - "test2.com"
 linksweight:
-  - "test1.com"
   - "test2.com"
+  - "test1.com"
 
 

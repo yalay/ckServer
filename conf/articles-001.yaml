@@ -1,0 +1,12 @@
+articles:
+  1:
+    title: test-title
+    cover: http://test.com/1.jpg
+    stitle: test-stitle
+    desc: test-dest
+    adlinks:
+      - http://adlinks1
+      - http://adlinks2
+    dllinks:
+      - http://dllinks1
+      - http://dllinks2

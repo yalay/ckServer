@@ -23,19 +23,13 @@ type imPageParams struct {
 }
 
 var emptyParams = imPageParams{
-	Title: "请从文章页点击下载",
-	Desc:  "没找到作品下载内容，请从文章页点击下载",
+	Title: "作品还未上传，暂时不能下载",
+	Desc:  "已通知相关客服，请等待更新",
 	Cover: "/img/logo.png",
 }
 
 // im/article/169
 func ImHandler(ctx *iris.Context) {
-	referUrl := ctx.Request.Referer()
-	if !conf.IsInWhiteList(referUrl) {
-		ctx.MustRender("im.html", emptyParams)
-		return
-	}
-
 	channel := ctx.Param("type")
 	if channel != "article" {
 		ctx.EmitError(iris.StatusNotFound)
@@ -48,20 +42,18 @@ func ImHandler(ctx *iris.Context) {
 		return
 	}
 
-	pkgCount := GetArticlePkgCount(articleId)
-	if pkgCount == 0 {
-		ctx.EmitError(iris.StatusNotFound)
+	adLinks := conf.GetArticleAdLinks(articleId)
+	if len(adLinks) == 0 {
+		ctx.MustRender("im.html", emptyParams)
 		return
 	}
 
 	articleKey := genArticleKey(articleId)
 	IncImCount(articleKey)
-	downloadUrls := make([]string, pkgCount)
-	for i, _ := range downloadUrls {
-		downloadUrls[i] = GenEncodedCkAdUrl(articleId, int32(i+1))
-	}
+	downloadUrls := make([]string, 1)
+	downloadUrls[0] = GenEncodedCkAdUrl(articleId, 1)
 
-	title, sTitle, desc, cover := GetArticleAttrs(articleId)
+	title, sTitle, cover, desc := conf.GetArticleAttrs(articleId)
 	params := imPageParams{
 		Id:           articleId,
 		Im:           GetImCount(articleKey),

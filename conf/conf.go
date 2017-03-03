@@ -1,16 +1,13 @@
 package conf
 
 import (
-	"common"
 	"flag"
-	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/url"
 	"os"
 	"strings"
 	"time"
-
-	"github.com/go-yaml/yaml"
 )
 
 var gConfig = &Config{}
@@ -18,6 +15,16 @@ var gConfig = &Config{}
 type Config struct {
 	WhiteRefers []string
 	LinksWeight []string // 按索引排序，越往前权重越大
+	Articles    map[int32]*Article
+}
+
+type Article struct {
+	Title   string
+	Cover   string
+	Stitle  string
+	Desc    string
+	AdLinks []string
+	DlLinks []string
 }
 
 func init() {
@@ -25,6 +32,43 @@ func init() {
 	flag.StringVar(&configFile, "c", "conf/config.yaml", "conf file path")
 
 	reloadConf(configFile)
+	rand.Seed(time.Now().Unix())
+}
+
+func GetArticleAdLinks(articleId int32) []string {
+	if len(gConfig.Articles) == 0 {
+		return nil
+	}
+
+	article, ok := gConfig.Articles[articleId]
+	if !ok || article == nil {
+		return nil
+	}
+	return article.AdLinks
+}
+
+func GetArticleAttrs(articleId int32) (string, string, string, string) {
+	if len(gConfig.Articles) == 0 {
+		return "", "", "", ""
+	}
+
+	article, ok := gConfig.Articles[articleId]
+	if !ok || article == nil {
+		return "", "", "", ""
+	}
+	return article.Title, article.Stitle, article.Cover, article.Desc
+}
+
+func GetArticleDlLinks(articleId int32) []string {
+	if len(gConfig.Articles) == 0 {
+		return nil
+	}
+
+	article, ok := gConfig.Articles[articleId]
+	if !ok || article == nil {
+		return nil
+	}
+	return article.DlLinks
 }
 
 func IsInWhiteList(url string) bool {
@@ -40,23 +84,23 @@ func IsInWhiteList(url string) bool {
 	return false
 }
 
-func GetHighestWeightLink(candidateLinks common.Set) string {
-	if candidateLinks.Size() == 0 {
+func GetHighestWeightLink(adLinks []string) string {
+	linksLen := len(adLinks)
+	if linksLen == 0 {
 		return ""
 	}
 
-	if candidateLinks.Size() == 1 || len(gConfig.LinksWeight) == 0 {
-		return candidateLinks.Random().(string)
+	if linksLen == 1 || len(gConfig.LinksWeight) == 0 {
+		return adLinks[rand.Intn(linksLen-1)]
 	}
 
-	hostsLink := make(map[string]string, candidateLinks.Size())
-	for link := range candidateLinks.Iter() {
-		linkRawUrl := link.(string)
-		linkUrl, err := url.Parse(linkRawUrl)
+	hostsLink := make(map[string]string, linksLen)
+	for _, adLink := range adLinks {
+		linkUrl, err := url.Parse(adLink)
 		if err != nil {
 			continue
 		}
-		hostsLink[linkUrl.Host] = linkRawUrl
+		hostsLink[linkUrl.Host] = adLink
 	}
 
 	for _, link := range gConfig.LinksWeight {
@@ -65,18 +109,13 @@ func GetHighestWeightLink(candidateLinks common.Set) string {
 		}
 	}
 
-	return candidateLinks.Random().(string)
+	return adLinks[rand.Intn(linksLen-1)]
 }
 
 func reloadConf(configFile string) {
-	configData, err := ioutil.ReadFile(configFile)
+	err := ParseYaml(configFile, gConfig)
 	if err != nil {
-		log.Panicf("read config file err:%v\n", err)
-	}
-
-	err = yaml.Unmarshal(configData, gConfig)
-	if err != nil {
-		log.Panicf("parse config file err:%v\n", err)
+		log.Panicf("ParseYaml err:%v\n", err)
 	}
 
 	log.Printf("config:%+v", gConfig)
@@ -89,13 +128,9 @@ func reloadYamlFile(configFile string, duration time.Duration, serverConf *Confi
 		time.Sleep(duration)
 		if curMtime := getFileMtime(configFile); curMtime > lastMtime {
 			lastMtime = curMtime
-			configData, err := ioutil.ReadFile(configFile)
+			err := ParseYaml(configFile, serverConf)
 			if err != nil {
-				log.Panicf("read config file err:%v\n", err)
-			}
-			err = yaml.Unmarshal(configData, &serverConf)
-			if err != nil {
-				log.Panicf("parse config file err:%v\n", err)
+				log.Panicf("ParseYaml err:%v\n", err)
 			}
 			log.Printf("config:%+v", serverConf)
 		}

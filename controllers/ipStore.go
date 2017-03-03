@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"common"
 	"conf"
 	"log"
 	"net/url"
@@ -67,7 +66,7 @@ func (s *ipStore) getCkLeastUrl(ip string, ckUrls []string) string {
 		return ""
 	}
 
-	var minCountsUrlSet common.Set
+	var minCountsUrls []string
 	var minCounts int
 	for _, ckUrl := range ckUrls {
 		ckParsedUrl, err := url.Parse(ckUrl)
@@ -77,19 +76,19 @@ func (s *ipStore) getCkLeastUrl(ip string, ckUrls []string) string {
 
 		host := ckParsedUrl.Host
 		num := s.getCount(ip, host)
-		if minCountsUrlSet == nil {
+		if len(minCountsUrls) == 0 {
 			minCounts = num
-			minCountsUrlSet = common.NewSet(ckUrl)
+			minCountsUrls = []string{ckUrl}
 		} else {
 			if num < minCounts {
 				minCounts = num
-				minCountsUrlSet = common.NewSet(ckUrl)
+				minCountsUrls = []string{ckUrl}
 			} else if num == minCounts {
-				minCountsUrlSet.Add(ckUrl)
+				minCountsUrls = append(minCountsUrls, ckUrl)
 			}
 		}
 	}
-	minCountsUrl := conf.GetHighestWeightLink(minCountsUrlSet)
+	minCountsUrl := conf.GetHighestWeightLink(minCountsUrls)
 	log.Printf("select link:%s\n", minCountsUrl)
 	s.counts(ip, minCountsUrl)
 	return minCountsUrl
