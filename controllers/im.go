@@ -30,12 +30,6 @@ var emptyParams = imPageParams{
 
 // im/articles/169
 func ImHandler(ctx *iris.Context) {
-	channel := ctx.Param("type")
-	if channel != "articles" {
-		ctx.EmitError(iris.StatusNotFound)
-		return
-	}
-
 	articleId := common.Atoi32(ctx.Param("id"))
 	if articleId == 0 {
 		ctx.EmitError(iris.StatusNotFound)

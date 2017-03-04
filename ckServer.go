@@ -30,7 +30,7 @@ func main() {
 	iris.UseTemplate(html.New(html.Config{Layout: iris.NoLayout})).Directory(common.TEMPLATE_PATH, ".html")
 
 	iris.Get("/ck/:info", controllers.CkHandler)
-	iris.Get("/im/:type/:id", controllers.ImHandler)
+	iris.Get("/im/:id", controllers.ImHandler)
 	iris.Get("/encodes/:id/:type/:index", controllers.EncodesGetHandler)
 	iris.Listen(":" + strconv.Itoa(listenPort))
 }
