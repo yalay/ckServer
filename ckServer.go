@@ -21,10 +21,10 @@ func init() {
 }
 
 func main() {
-	iris.StaticWeb("/img", common.TEMPLATE_PATH+"/img")
-	iris.StaticWeb("/css", common.TEMPLATE_PATH+"/css")
-	iris.StaticWeb("/js", common.TEMPLATE_PATH+"/js")
-	iris.StaticWeb("/fonts", common.TEMPLATE_PATH+"/fonts")
+	iris.StaticWeb("img", common.TEMPLATE_PATH+"/img")
+	iris.StaticWeb("css", common.TEMPLATE_PATH+"/css")
+	iris.StaticWeb("js", common.TEMPLATE_PATH+"/js")
+	iris.StaticWeb("fonts", common.TEMPLATE_PATH+"/fonts")
 
 	iris.Use(logger.New())
 	iris.UseTemplate(html.New(html.Config{Layout: iris.NoLayout})).Directory(common.TEMPLATE_PATH, ".html")
