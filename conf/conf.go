@@ -90,7 +90,11 @@ func GetHighestWeightLink(adLinks []string) string {
 		return ""
 	}
 
-	if linksLen == 1 || len(gConfig.LinksWeight) == 0 {
+	if linksLen == 1 {
+		return adLinks[0]
+	}
+
+	if len(gConfig.LinksWeight) == 0 {
 		return adLinks[rand.Intn(linksLen-1)]
 	}
 
