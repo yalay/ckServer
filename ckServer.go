@@ -21,16 +21,16 @@ func init() {
 }
 
 func main() {
-	iris.StaticWeb("img", common.TEMPLATE_PATH+"/img")
-	iris.StaticWeb("css", common.TEMPLATE_PATH+"/css")
-	iris.StaticWeb("js", common.TEMPLATE_PATH+"/js")
-	iris.StaticWeb("fonts", common.TEMPLATE_PATH+"/fonts")
+	iris.StaticWeb("static/img", common.TEMPLATE_PATH+"/img")
+	iris.StaticWeb("static/css", common.TEMPLATE_PATH+"/css")
+	iris.StaticWeb("static/js", common.TEMPLATE_PATH+"/js")
+	iris.StaticWeb("static/fonts", common.TEMPLATE_PATH+"/fonts")
 
 	iris.Use(logger.New())
 	iris.UseTemplate(html.New(html.Config{Layout: iris.NoLayout})).Directory(common.TEMPLATE_PATH, ".html")
 
 	iris.Get("/ck/:info", controllers.CkHandler)
-	iris.Get("/im/:id", controllers.ImHandler)
+	iris.Get("/im/:type/:id", controllers.ImHandler)
 	iris.Get("/encodes/:id/:type/:index", controllers.EncodesGetHandler)
 	iris.Listen(":" + strconv.Itoa(listenPort))
 }
