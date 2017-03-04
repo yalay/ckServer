@@ -25,7 +25,7 @@ type imPageParams struct {
 var emptyParams = imPageParams{
 	Title: "作品还未上传，暂时不能下载",
 	Desc:  "已通知相关客服，请等待更新",
-	Cover: "/img/logo.png",
+	Cover: "/static/img/logo.png",
 }
 
 // im/articles/169
