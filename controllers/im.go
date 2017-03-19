@@ -54,6 +54,9 @@ func ImHandler(ctx *iris.Context) {
 	downloadUrls[0] = GenEncodedCkAdUrl(articleId, 1)
 
 	title, sTitle, cover, desc := conf.GetArticleAttrs(articleId)
+	if desc == "" {
+		desc = title
+	}
 	params := imPageParams{
 		Id:           articleId,
 		Im:           GetImCount(articleKey),
