@@ -3,6 +3,7 @@ package controllers
 import (
 	"common"
 	"conf"
+	"path/filepath"
 
 	"github.com/kataras/iris"
 )
@@ -57,6 +58,10 @@ func ImHandler(ctx *iris.Context) {
 	if desc == "" {
 		desc = title
 	}
+	if sTitle == "" {
+		sTitle = filepath.Base(filepath.Dir(cover))
+	}
+
 	params := imPageParams{
 		Id:           articleId,
 		Im:           GetImCount(articleKey),
