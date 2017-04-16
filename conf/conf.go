@@ -59,6 +59,18 @@ func GetArticleAttrs(articleId int32) (string, string, string, string) {
 	return article.Title, article.Stitle, article.Cover, article.Desc
 }
 
+func GetArticleStitle(articleId int32) string {
+	if len(gConfig.Articles) == 0 {
+		return ""
+	}
+
+	article, ok := gConfig.Articles[articleId]
+	if !ok || article == nil {
+		return ""
+	}
+	return article.Stitle
+}
+
 func GetArticleDlLinks(articleId int32) []string {
 	if len(gConfig.Articles) == 0 {
 		return nil

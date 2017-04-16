@@ -32,5 +32,6 @@ func main() {
 	iris.Get("/ck/:info", controllers.CkHandler)
 	iris.Get("/im/:type/:id", controllers.ImHandler)
 	iris.Get("/encodes/:id/:type/:index", controllers.EncodesGetHandler)
+	iris.Get("/ajax/:type/:id", controllers.AjaxGetHandler)
 	iris.Listen(":" + strconv.Itoa(listenPort))
 }
